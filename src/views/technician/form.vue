@@ -1,5 +1,9 @@
 <script setup>
-import { ref } from 'vue'
+import { ref } from 'vue';
+import PageHeader from '@/components/shared/PageHeader.vue';
+import StatusBadge from '@/components/shared/StatusBadge.vue';
+import DashboardCard from '@/components/shared/DashboardCard.vue';
+import { useAppStore } from '@/stores/useAppStore';
 const open = ref(true)
 const alerta = ref(null)
 const form = ref({
@@ -19,24 +23,16 @@ function handleSubmit() {
 }
 </script>
 
+
 <template>
-  <div class="app-shell" style="display: flex; flex-direction: column; padding: 20px; margin-left: -20px; margin-top: -20px;">
-    <header class="page-header card" style="max-width: auto; margin: 0 0 20px 0;" >
-        <div>
-          <div class="page-header__title-row">
-            <span class="page-header__accent" style="background-color: rgb(194, 167, 105); "></span>
-              <h1 class="page-header__title">Registrar Insumos y Medicamentos</h1>
-          </div>
-        <p class="page-header__subtitle">Registro de Insumos para el consultorio.</p>
-      </div>
-    </header>
-    <main>
-      <section class="card" style=" margin: 0 0 20px 0; ">
-        <div class="section__div" @click="toggle" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-          <h2 class="section__title">Solicitudes</h2>
-        </div>
-        <form v-show="open" class="stack" style="margin-top: 28px;" @submit.prevent="handleSubmit">
-          <div class="field">
+   <div class="stack">
+    <PageHeader 
+        title="Formulario de insumos" 
+        subtitle="formulario para el stock de insumos y medicamentos."
+    />
+  <DashboardCard title="Solicitud de insumos" icon="notebook-pen">
+    <form v-show="open" class="stack" style="margin-top: 28px;" @submit.prevent="handleSubmit">
+              <div class="field">
             <label for="nombre">Nombre*</label>
             <input class="input" id="nombre" v-model="form.nombre" required placeholder="Nombre del medicamento o insumo" />
           </div>
@@ -71,7 +67,13 @@ function handleSubmit() {
           <button class="btn btn--primary" type="submit">Registrar</button>
         </form>
         <p v-if="alerta" class="chip chip--success" style="margin-top: 18px; border-color: #c2a769; display:inline-block;">{{ alerta }}</p>
-      </section>
-    </main>
+  </DashboardCard>
   </div>
 </template>
+
+<style>
+label{
+  padding: 12px 8px;
+}
+
+</style>
