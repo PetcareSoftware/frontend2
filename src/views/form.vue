@@ -1,17 +1,17 @@
 
 <template>
-  <div class="app-shell">
-    <header class="page-header_card" style="margin:30px;">
+  <div class="app-shell" style="display: flex; flex-direction: column; padding: 20px; margin-left: -20px; margin-top: -20px;">
+    <header class="page-header card" style="max-width: auto; margin: 0 0 20px 0;" >
         <div>
           <div class="page-header__title-row">
-            <span class="page-header__accent" style="background: rgb(194, 167, 105); "></span>
+            <span class="page-header__accent" style="background-color: rgb(194, 167, 105); "></span>
               <h1 class="page-header__title">Registrar Insumos y Medicamentos</h1>
           </div>
         <p class="page-header__subtitle">Registro de Insumos para el consultorio.</p>
       </div>
     </header>
     <main>
-      <section class="card" style="max-width: 900px; margin: 40px; align-items: left; justify-content: right;">
+      <section class="card" style=" margin: 0 0 20px 0; ">
         <div class="section__div" @click="toggle" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
           <h2 class="section__title">Solicitudes</h2>
         </div>
@@ -67,6 +67,7 @@ const form = ref({
   umbral: '',        
   observaciones: ''
 })
+
 
 function handleSubmit() {
   alerta.value = '¡registrado con exito!'
