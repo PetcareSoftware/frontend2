@@ -1,3 +1,23 @@
+<script setup>
+import { ref } from 'vue'
+const open = ref(true)
+const alerta = ref(null)
+const form = ref({
+  nombre: '',
+  tipo: '',
+  cantidad: '',
+  umbral: '',        
+  observaciones: ''
+})
+
+
+function handleSubmit() {
+  alerta.value = '¡registrado con exito!'
+  // Aquí podrías limpiar el formulario o hacer submit real
+  setTimeout(() => (alerta.value = null), 2500)
+  Object.assign(form.value, { nombre: '', tipo: '', cantidad: '', umbral: '', observaciones: '' });
+}
+</script>
 
 <template>
   <div class="app-shell" style="display: flex; flex-direction: column; padding: 20px; margin-left: -20px; margin-top: -20px;">
@@ -55,24 +75,3 @@
     </main>
   </div>
 </template>
-
-<script setup>
-import { ref } from 'vue'
-const open = ref(true)
-const alerta = ref(null)
-const form = ref({
-  nombre: '',
-  tipo: '',
-  cantidad: '',
-  umbral: '',        
-  observaciones: ''
-})
-
-
-function handleSubmit() {
-  alerta.value = '¡registrado con exito!'
-  // Aquí podrías limpiar el formulario o hacer submit real
-  setTimeout(() => (alerta.value = null), 2500)
-  Object.assign(form.value, { nombre: '', tipo: '', cantidad: '', umbral: '', observaciones: '' });
-}
-</script>
