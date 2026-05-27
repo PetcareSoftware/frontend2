@@ -2,15 +2,33 @@
 import { computed } from 'vue';
 import PageHeader from '@/components/shared/PageHeader.vue';
 import DashboardCard from '@/components/shared/DashboardCard.vue';
-import { useAppStore } from '@/stores/useAppStore';
 import { formatMoney } from '@/lib/petcare';
 import { evaluateProductAlertState } from '@/lib/inventory';
+import { useAppStore } from '@/stores/useAppStore';
+import { exportToExcel, exportToPDF } from '@/lib/export';
 
 const appStore = useAppStore();
 const inventory = computed(() => appStore.inventory);
 
 const formatUnitCost = (value) =>
   formatMoney(value, { locale: 'en-US', currency: 'USD', maximumFractionDigits: 2 });
+
+
+const getReportData = () => inventory.value.map(item => ({
+    Nombre: item.name,
+    Tipo: item.type,
+    Cantidad: item.quantity,
+    'Stock Mínimo': item.umbral,
+    'Costo Unitario (USD)': item.unitCost
+}));
+
+const handleDownloadExcel = () => {
+  exportToExcel(getReportData(), 'Inventario_Excel_2026');
+};
+
+const handleDownloadPDF = () => {
+  exportToPDF(appStore.inventory, appStore.requisitions);
+};
 
 const alertByItemId = computed(() => {
   const map = new Map();
@@ -29,6 +47,14 @@ const alertByItemId = computed(() => {
     />
 
     <DashboardCard title="Vista General del Inventario" icon="syringe">
+      <div class="report-actions" style="margin-bottom: 20px; display: flex; gap: 10px;">
+        <button class="btn btn--secondary" @click="handleDownloadExcel">
+          Exportar a Excel
+        </button>
+        <button class="btn btn--primary" @click="handleDownloadPDF" type="button">
+          Generar Reporte Formal (PDF)
+        </button>
+      </div>
       <section class="table-wrap inventory-table-wrap">
         <table class="table">
           <thead>
