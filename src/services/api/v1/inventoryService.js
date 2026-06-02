@@ -1,64 +1,86 @@
-import api from './api';
+import api from './api.js';
+import { Supply } from '@/models/supply.js';
+import { Batch } from '@/models/batch.js';
+import { unwrapApiList } from '@/models/utils.js';
 
-const SUPPLIES_BASE = 'supplies/';
-const BATCHES_BASE = 'batches/';
 
-/** Mapeo UI → payload Django para catálogo (supplies). */
-function toSupplyPayload(supply) {
-  return {
+export const SUPPLIES_BASE = 'supplies/';
+export const BATCHES_BASE = 'batches/';
+
+
+export class InventoryService {
+  static async list(params = {}) {
+    const response = await api.get(SUPPLIES_BASE, { params });
+    const rows = unwrapApiList(response.data);
+
+    return rows.map((row) => Supply.fromApi(row));
+  }
+
+  static async get(id) {
+    const response = await api.get(`${SUPPLIES_BASE}${id}/`);
+
+    return Supply.fromApi(response.data);
+  }
+
+  static async create(supply, initialStock = null) {
+    const payload = supply instanceof Supply ? supply.toApiCreate(initialStock) : supply;
+    const response = await api.post(SUPPLIES_BASE, payload);
+
+    return Supply.fromApi(response.data);
+  }
+
+  static async update(id, supply) {
+    const payload = supply instanceof Supply ? supply.toApiUpdate() : supply;
+    const response = await api.patch(`${SUPPLIES_BASE}${id}/`, payload);
+
+    return Supply.fromApi(response.data);
+  }
+
+  static async delete(id) {
+    const response = await api.delete(`${SUPPLIES_BASE}${id}/`);
+
+    return response.data;
+  }
+
+  static async createBatch(batch) {
+    const payload = batch instanceof Batch ? batch.toApiCreate() : batch;
+    const response = await api.post(BATCHES_BASE, payload);
+    const body = response.data;
+
+    if (body?.batch) {
+      return Batch.fromApi(body.batch);
+    }
+
+    return null;
+  }
+}
+
+/** @deprecated Compatibilidad con useAppStore. */
+export async function listSupplies(params = {}) {
+  const supplies = await InventoryService.list(params);
+
+  return supplies.map((supply) => ({
+    id: supply.id,
     sku: supply.sku,
     name: supply.name,
-    description: supply.description ?? null,
-    category: supply.category ?? supply.type,
-    min_stock: supply.min_stock ?? supply.minStock ?? 0,
-    unit_cost: supply.unit_cost ?? supply.unitCost ?? null,
-  };
+    category: supply.category || supply.type,
+    description: supply.description,
+    quantity: supply.quantity,
+    unitCost: supply.unitCost,
+    umbral: supply.minStock,
+    batches: supply.batches.map((batch) => ({
+      batch: batch.batch,
+      expirationDate: batch.expirationDate,
+      quantity: batch.quantity,
+      initialStock: batch.initialStock,
+    })),
+  }));
 }
 
-/** Mapeo UI → payload Django para reposición por lote (supply_batches). */
-function toBatchPayload(batch) {
-  return {
-    supply_id: batch.supply_id ?? batch.supplyId,
-    lot_number: batch.lot_number ?? batch.batchNumber ?? batch.batch,
-    expiry_date: batch.expiry_date ?? batch.expiryDate ?? batch.expirationDate,
-    quantity: batch.quantity,
-    acquisition_cost: batch.acquisition_cost ?? batch.acquisitionCost ?? null,
-    observations: batch.observations ?? null,
-  };
-}
-
-export async function listSupplies(params = {}) {
-  const response = await api.get(SUPPLIES_BASE, { params });
-  return response.data;
-}
-
-export async function getSupply(supplyId) {
-  const response = await api.get(`${SUPPLIES_BASE}${supplyId}/`);
-  return response.data;
-}
-
-export async function createSupply(supply) {
-  const response = await api.post(SUPPLIES_BASE, toSupplyPayload(supply));
-  return response.data;
-}
-
-export async function updateSupply(supplyId, supply) {
-  const response = await api.patch(`${SUPPLIES_BASE}${supplyId}/`, toSupplyPayload(supply));
-  return response.data;
-}
-
-export async function replaceSupply(supplyId, supply) {
-  const response = await api.put(`${SUPPLIES_BASE}${supplyId}/`, toSupplyPayload(supply));
-  return response.data;
-}
-
-export async function deleteSupply(supplyId) {
-  const response = await api.delete(`${SUPPLIES_BASE}${supplyId}/`);
-  return response.data;
-}
-
-/** Registro de entrada de mercancía por lote (reposición). */
+/** @deprecated Compatibilidad con useAppStore. */
 export async function createBatch(batch) {
-  const response = await api.post(BATCHES_BASE, toBatchPayload(batch));
-  return response.data;
+  const normalized = Batch.fromApi(batch);
+  const created = await InventoryService.createBatch(normalized);
+
+  return created ? created.toApi() : null;
 }

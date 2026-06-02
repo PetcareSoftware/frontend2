@@ -1,59 +1,108 @@
-import { ValidationError } from "./utils";
-import { Batch } from "./batch";
+import { ValidationError, equalsByProperties } from './utils.js';
+import { Batch } from './batch.js';
 
 
 export class Supply {
-  id = '';
+  id = null;
+  sku = '';
   name = '';
+  description = '';
   type = '';
+  category = '';
   quantity = 0;
   unitCost = 0;
-  minStock = 0;
-  batches = [new Batch('A', '1970-01-01')];
+  minStock = 10;
+  umbral = 10;
+  batches = [];
 
-  constructor({ id, name, type, quantity, unitCost, minStock, batches }) {
-    this.id = id;
+  constructor({
+    id, sku, name, description, type, category,
+    quantity, unitCost, minStock, umbral, batches,
+  }) {
+    this.id = id ?? this.id;
+    this.sku = sku || this.sku;
     this.name = name || this.name;
+    this.description = description ?? this.description;
     this.type = type || this.type;
-    this.quantity = quantity || this.quantity;
-    this.unitCost = unitCost || this.unitCost;
-    this.minStock = minStock || this.minStock;
+    this.category = category || this.category;
+    this.quantity = quantity ?? this.quantity;
+    this.unitCost = unitCost ?? this.unitCost;
+    this.minStock = minStock ?? umbral ?? this.minStock;
+    this.umbral = this.minStock;
     this.batches = Array.isArray(batches) ?
-      batches.map(batch => new Batch(batch)) :
-      batches || [];
+      batches.map((entry) => entry instanceof Batch ? entry : Batch.fromApi(entry)) :
+      [];
   }
 
   validate() {
-    if (! this.name) {
-      throw new ValidationError('Nombre vacío', 'name');
+    if (!this.name) {
+      throw new ValidationError('Nombre vac�o', 'name');
     }
-    if (! this.type) {
-      throw new ValidationError('Tipo vacío', 'type');
+    if (!(this.category || this.type)) {
+      throw new ValidationError('Categor�a vac�a', 'category');
     }
-    if (! (Number.isInteger(this.quantity) && this.quantity >= 0)) {
-      throw new ValidationError('Cantidad inválida', 'quantity');
-    }
-    if (!(typeof this.unitCost === 'number' && this.unitCost >= 0)) {
-      throw new ValidationError('Costo unitario inválido', 'unitCost');
-    }
-    if (! (Number.isInteger(this.minStock) && this.minStock >= 0)) {
-      throw new ValidationError('Nivel mínimo inválido', 'minStock');
-    }
-    if (!Array.isArray(this.batches) || this.batches.length === 0) {
-      throw new ValidationError('Debe haber al menos un lote', 'batches');
-    }
-    if (! (this.batches && this.batches.every)) {
-      throw new ValidationError('Lotes vacíos', 'batches');
-    }
-    try {
-      this.batches.every(batch => batch.validate());
-    } catch (e) {
-      if (e instanceof ValidationError) {
-        throw new ValidationError('Lotes inválidos', 'batches', { cause: e });
-      }
-      throw e;
+    if (!(Number.isInteger(this.minStock) && this.minStock >= 1)) {
+      throw new ValidationError('Stock m�nimo inv�lido', 'minStock');
     }
 
     return true;
+  }
+
+  toApi() {
+    const data = {
+      name: this.name,
+      category: this.category || this.type,
+      description: this.description || '',
+      min_stock: this.minStock,
+    };
+
+    if (this.sku) {
+      data.sku = this.sku;
+    }
+
+    return data;
+  }
+
+  static fromApi(data) {
+    const batches = data.batches ?? data.lots ?? [];
+    const minStock = Number(data.min_stock ?? data.min_stock_alert ?? data.minStock ?? data.umbral ?? 10);
+
+    return new Supply({
+      id: data.id ?? null,
+      sku: data.sku ?? '',
+      name: data.name ?? '',
+      description: data.description ?? '',
+      type: data.type ?? data.category ?? '',
+      category: data.category ?? '',
+      quantity: Number(data.quantity ?? data.current_stock ?? 0),
+      unitCost: Number(data.unitCost ?? data.unit_cost ?? 0),
+      minStock,
+      umbral: minStock,
+      batches: Array.isArray(batches) ? batches.map((batch) => Batch.fromApi(batch)) : [],
+    });
+  }
+
+  toApiCreate(initialStock = null) {
+    const data = this.toApi();
+
+    if (initialStock != null) {
+      data.initial_stock = Number(initialStock);
+    }
+
+    return data;
+  }
+
+  toApiUpdate() {
+    return this.toApi();
+  }
+
+  equals(other) {
+    if (!other) {
+      return false;
+    }
+
+    return this.id != null && other.id != null ?
+      this.id === other.id :
+      equalsByProperties(this, other, ['sku', 'name']);
   }
 }

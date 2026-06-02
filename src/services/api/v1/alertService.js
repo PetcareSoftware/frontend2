@@ -1,12 +1,25 @@
-import api from './api';
+import api from './api.js';
+import { Alert } from '@/models/alert.js';
+import { unwrapApiList } from '@/models/utils.js';
 
-const ALERTS_BASE = 'alerts/';
 
-/**
- * Insumos en estado crítico (stock bajo / vencimiento próximo).
- * @param {Record<string, unknown>} params - filtros opcionales del backend (ej. severity, category)
- */
+export const ALERTS_BASE = 'alerts/';
+
+
+export class AlertService {
+  static async list(params = {}) {
+    const response = await api.get(ALERTS_BASE, { params });
+    const rows = unwrapApiList(response.data?.alerts ?? response.data);
+
+    return rows.map((row) => Alert.fromApi(row));
+  }
+}
+
+/** @deprecated Compatibilidad temporal. */
 export async function listCriticalAlerts(params = {}) {
-  const response = await api.get(ALERTS_BASE, { params });
-  return response.data;
+  const alerts = await AlertService.list(params);
+
+  return {
+    alerts: alerts.map((alert) => alert.toApi()),
+  };
 }

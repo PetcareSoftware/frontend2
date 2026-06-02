@@ -1,22 +1,27 @@
-import api from './api';
+import api from './api.js';
+import { Consumption } from '@/models/consumption.js';
 
-const CONSUME_BASE = 'consume/';
 
-/**
- * Descuenta stock por consumo en consulta u operación clínica.
- * @param {{ supply_id: string|number, quantity: number, batch_id?: string|number, consultation_id?: string|number }} payload
- */
+export const CONSUME_BASE = 'consume/';
+
+
+export class ConsumptionService {
+  static async consume(consumption) {
+    const payload = consumption instanceof Consumption ? consumption.toApi() : consumption;
+    const response = await api.post(CONSUME_BASE, payload);
+
+    return Consumption.fromApi(response.data);
+  }
+}
+
+/** @deprecated Compatibilidad temporal. */
 export async function consumeSupply(payload) {
-  const batch_id = payload.batch_id ?? payload.batchId;
-  const consultation_id = payload.consultation_id ?? payload.consultationId;
+  const result = await ConsumptionService.consume(payload);
 
-  const body = {
-    supply_id: payload.supply_id ?? payload.supplyId,
-    quantity: payload.quantity,
-    ...(batch_id != null && { batch_id }),
-    ...(consultation_id != null && { consultation_id }),
+  return {
+    message: result.message,
+    supply_id: result.supplyId,
+    name: result.name,
+    remaining_stock: result.remainingStock,
   };
-
-  const response = await api.post(CONSUME_BASE, body);
-  return response.data;
 }
