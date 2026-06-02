@@ -31,7 +31,7 @@ export function equalsByProperties(first, second, props, mode = 'and') {
 export function shiftDate(dateStr, fromDate = getTodayDate() + 'T12:00:00') {
   if (!dateStr) return dateStr;
 
-  const base = fromDate.getTime();
+  const base = new Date(fromDate).getTime();
   const today = new Date();
   today.setHours(12, 0, 0, 0);
   const diff = today.getTime() - base;
