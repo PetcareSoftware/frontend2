@@ -5,6 +5,7 @@
   import { useAppStore } from '@/stores/useAppStore';
   import Logo from '@/components/shared/Logo.vue';
   import AppIcon from '@/components/shared/AppIcon.vue';
+  import NotificationsPanel from '@/components/shared/NotificationsPanel.vue';
 
   const appStore = useAppStore();
   const route = useRoute();
@@ -38,6 +39,9 @@
       </RouterLink>
     </nav>
 
-    <div class="sidebar__footer">{{ appTemplate.footerLabel }}</div>
+    <div class="sidebar__footer" style="display: flex; align-items: center; justify-content: space-between;">
+      <span>{{ appTemplate.footerLabel }}</span>
+      <NotificationsPanel />
+    </div>
   </aside>
 </template>

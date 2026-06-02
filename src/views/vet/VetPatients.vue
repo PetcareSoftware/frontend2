@@ -11,6 +11,7 @@
     getVet,
     getLatestConsultation,
     getLatestVaccine,
+    getTodayShortDate,
   } from '@/lib/petcare';
 
   const appStore = useAppStore();
@@ -19,7 +20,7 @@
   const currentVetId = computed(() => appStore.currentUserId || 'v1');
   const patients = computed(() =>
     getAppointmentsByVet(appStore.appointments, currentVetId.value).filter(
-      (appointment) => appointment.date === '2026-05-08'
+      (appointment) => appointment.date === getTodayShortDate()
     )
   );
   const selectedAppointment = computed(
@@ -28,6 +29,29 @@
       patients.value[0] ||
       null
   );
+
+  const handleStatusChange = () => {
+    if (!selectedAppointment.value) return;
+    const currentStatus = selectedAppointment.value.status;
+    let newStatus = '';
+
+    if (currentStatus === 'confirmed') newStatus = 'in_progress';
+    else if (currentStatus === 'in_progress') newStatus = 'completed';
+
+    if (newStatus) {
+      appStore.updateAppointment({
+        ...selectedAppointment.value,
+        status: newStatus
+      });
+    }
+  };
+
+  const getStatusButtonLabel = computed(() => {
+    if (!selectedAppointment.value) return '';
+    if (selectedAppointment.value.status === 'confirmed') return 'Iniciar Consulta';
+    if (selectedAppointment.value.status === 'in_progress') return 'Completar Consulta';
+    return '';
+  });
 </script>
 
 <template>
@@ -69,6 +93,16 @@
               {{ getVet(appStore.vets, currentVetId)?.name || 'Veterinario' }}
             </h2>
             <p class="hero-intro__text">{{ selectedAppointment.reason }}</p>
+            <div class="toolbar__group" style="margin-top: 1.5rem;">
+              <StatusBadge :status="selectedAppointment.status" />
+              <button
+                v-if="getStatusButtonLabel"
+                class="btn btn--primary btn--sm"
+                @click="handleStatusChange"
+              >
+                {{ getStatusButtonLabel }}
+              </button>
+            </div>
           </div>
           <div class="list__item">
             <div class="toolbar__group">

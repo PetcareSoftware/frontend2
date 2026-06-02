@@ -74,13 +74,17 @@ export class AuthenticationService {
       throw new TypeError("Tiene que darse las credenciales");
     }
 
-    let tokens;
+    let tokens, user;
     try {
-      tokens = this.axios.post(this.urls.auth, credentials);
+      tokens = await this.axios.post(this.urls.auth, credentials);
+      tokens = tokens.data;
 
-      for (const token in tokens) {
-        tokens[token] = this.readJWT(tokens[token]);
+      if (tokens.user) {
+        user = tokens.user;
+        delete tokens.user;
       }
+
+      tokens = this.readTokens(tokens);
     } catch (e) {
       if (e.status === 401) {
         const newError = new this.constructor.AuthServiceError(
@@ -93,7 +97,7 @@ export class AuthenticationService {
     }
 
     this._saveAccessRefresh(tokens, false);
-    return true;
+    return user || true;
   }
 
   deleteToken(type = 'access', { broadcast = true }) {
@@ -228,14 +232,17 @@ export class AuthenticationService {
     return promise.catch(e => {
       const newError = new this.constructor.AuthServiceError('Requiere autenticación', 'unauthenticated');
       newError.cause = e;
-      Promise.reject(newError);
+      return Promise.reject(newError);
     });
   }
 
   _saveToken(token, type = 'access', { allowDelete = false, fromGetter = false }) {
-    if (!token && !allowDelete) return;
-    if (!(token.value != null && (token.expiration == null || typeof token.expiration === 'number') )) {
-      throw new TypeError('Formato de token inválido. Debe ser { value: not_null, expiration?: number }');
+    if (!allowDelete) {
+      if (!token) return;
+
+      if (!(token.value != null && (token.expiration == null || typeof token.expiration === 'number') )) {
+        throw new TypeError('Formato de token inválido. Debe ser { value: not_null, expiration?: number }');
+      }
     }
 
     const storage = this._getStorage();
@@ -308,11 +315,31 @@ export class AuthenticationService {
     return name ? decoded?.[name] : decoded;
   }
 
+  readTokens(tokens) {
+    if (typeof tokens === 'string') {
+      tokens = { access: { value: tokens } };
+    }
+    else if (typeof tokens === 'object' && !Array.isArray(tokens)) {
+      for (const token in tokens) {
+        tokens[token] = this.readJWT(tokens[token]);
+      }
+    } else {
+      throw new this.constructor.AuthServiceError(
+        'Formato de tokens desconocido', 'unknownTokenFormat'
+      );
+    }
+
+    return tokens;
+  }
+
   readJWT(token) {
     token = { value: token };
 
     try {
-      token.expiration = this.getJWTField(token.value, 'claims', 'exp') * 1000;
+      const expiration = this.getJWTField(token.value, 'claims', 'exp');
+      if (expiration) {
+        token.expiration = expiration * 1000;
+      }
     } catch {}  // eslint-disable-line no-empty
 
     return token;
@@ -320,7 +347,8 @@ export class AuthenticationService {
 
   async _requestToken(type, credentials) {
     if (type === 'access') {
-      return this.readJWT(this.axios.post(this.urls.refresh, { refresh: credentials.refresh }));
+      const response = await this.axios.post(this.urls.refresh, { refresh: credentials.refresh });
+      return this.readTokens(response.data)['access'];
     } else {
       throw new Error(`No se puede solicitar este token: ${type}`);
     }

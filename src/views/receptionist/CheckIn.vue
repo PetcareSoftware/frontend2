@@ -4,7 +4,8 @@
   import PetAvatar from '@/components/shared/PetAvatar.vue';
   import { useAppStore } from '@/stores/useAppStore';
   import { useToastStore } from '@/stores/useToastStore';
-  import { getTodayAppointments, getPet, getVet } from '@/lib/petcare';
+  import { getTodayAppointments, getPet, getVet, statusMeta,
+           appointmentTransitions } from '@/lib/petcare';
 
   const appStore = useAppStore();
   const toastStore = useToastStore();
@@ -13,9 +14,13 @@
     appStore.updateAppointment({ ...appointment, status });
     toastStore.push({
       title: 'Estado actualizado',
-      description: `${appointment.reason} cambió a ${status}.`,
+      description: `${appointment.reason} cambió a ${statusMeta[status]?.label.toLowerCase() || status}.`,
       type: 'success',
     });
+  }
+
+  function getTransitions(status) {
+    return appointmentTransitions[status] || [];
   }
 </script>
 
@@ -25,13 +30,18 @@
 
     <section class="card table-wrap">
       <table class="table">
+        <colgroup>
+          <col>
+          <col>
+          <col>
+          <col style="width: 12rem;">
+        </colgroup>
         <thead>
           <tr>
             <th>Paciente</th>
             <th>Hora</th>
             <th>Veterinario</th>
             <th>Estado</th>
-            <th />
           </tr>
         </thead>
         <tbody>
@@ -51,31 +61,14 @@
             </td>
             <td>{{ appointment.time }}</td>
             <td>{{ getVet(appStore.vets, appointment.vetId)?.name }}</td>
-            <td><StatusBadge :status="appointment.status" /></td>
             <td>
-              <div class="toolbar__group">
-                <button
-                  class="btn btn--soft"
-                  type="button"
-                  @click="setStatus(appointment, 'confirmed')"
-                >
-                  Confirmar
-                </button>
-                <button
-                  class="btn btn--soft"
-                  type="button"
-                  @click="setStatus(appointment, 'in_progress')"
-                >
-                  Iniciar
-                </button>
-                <button
-                  class="btn btn--soft"
-                  type="button"
-                  @click="setStatus(appointment, 'completed')"
-                >
-                  Completar
-                </button>
-              </div>
+              <select class="select" style="min-width: 140px; padding: 6px 12px;"
+                :value="appointment.status" @change="setStatus(appointment, $event.target.value)"
+              >
+                <option v-for="(_ignore, newStatus) in appointmentTransitions" :key="newStatus"
+                  :value="newStatus" v-show="getTransitions(appointment.status).includes(newStatus)"
+                >{{ statusMeta[newStatus]?.label || '' }}</option>
+              </select>
             </td>
           </tr>
         </tbody>

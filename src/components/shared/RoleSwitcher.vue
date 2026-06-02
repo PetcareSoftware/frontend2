@@ -1,8 +1,19 @@
 <script setup>
   import { appTemplate } from '@/config/appTemplate';
   import { useAppStore } from '@/stores/useAppStore';
+  import { useRouter } from 'vue-router';
+  import { switchRoleLocal as switchRoleAction } from '@/lib/petcare';
 
   const appStore = useAppStore();
+  const router = useRouter();
+
+  function switchRole(item) {
+    switchRoleAction(item, appStore, router);
+  }
+
+  function logout() {
+    router.push('/login');
+  }
 </script>
 
 <template>
@@ -20,10 +31,26 @@
             ? { background: appTemplate.roles[item.key].accent }
             : undefined
         "
-        @click="appStore.setRole(item.key, item.userId || undefined)"
+        @click="switchRole(item)"
       >
         {{ item.label }}
+      </button>
+
+      <button
+        type="button"
+        class="role-chip btn-logout"
+        @click="logout"
+      >
+        Cerrar sesión
       </button>
     </div>
   </aside>
 </template>
+
+<style scoped>
+.btn-logout {
+  background: rgba(178, 60, 60, 0.12);
+  color: var(--danger);
+  border-color: rgba(178, 60, 60, 0.2);
+}
+</style>

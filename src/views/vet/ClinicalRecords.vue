@@ -5,7 +5,8 @@
   import StatusBadge from '@/components/shared/StatusBadge.vue';
   import DashboardCard from '@/components/shared/DashboardCard.vue';
   import { useAppStore } from '@/stores/useAppStore';
-  import { formatDate, getPetConsultations, getPetVaccines, getPetDewormings } from '@/lib/petcare';
+  import { formatDate, getPetConsultations, getPetVaccines, getPetDewormings,
+           getSpeciesLabel } from '@/lib/petcare';
 
   const appStore = useAppStore();
   const selectedPetId = ref(appStore.pets[0]?.id || '');
@@ -38,7 +39,7 @@
                 <p class="list__subtitle">{{ pet.breed }}</p>
               </div>
             </div>
-            <span class="chip chip--sage">{{ pet.species }}</span>
+            <span class="chip chip--sage">{{ getSpeciesLabel(pet.species) }}</span>
           </button>
         </div>
       </DashboardCard>

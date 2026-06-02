@@ -8,15 +8,15 @@
     "start": "npm install && npm run dev",
     "build": "vite build",
     "preview": "vite preview",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,vue,json,css,scss,md,html}\"",
+    "check": "eslint",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,vue,json,css,scss,md,html}\""
   },
   "dependencies": {
+    "@lucide/vue": "^1.16.0",
     "axios": "^1.16.0",
     "chart.js": "^4.5.1",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
-    "lucide-vue-next": "^1.0.0",
     "pinia": "^3.0.3",
     "vue": "^3.5.32",
     "vue-chartjs": "^5.3.3",
@@ -24,8 +24,14 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@vitejs/plugin-vue": "^6.0.6",
+    "eslint": "^10.4.0",
+    "eslint-plugin-vue": "^10.9.1",
+    "globals": "^17.6.0",
+    "playwright": "^1.60.0",
     "prettier": "^3.8.3",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "vite-plugin-vue-devtools": "^8.1.2"
   }
 }

@@ -33,7 +33,7 @@
       subtitle="Consultas, vacunas y tratamientos anteriores del propietario."
     />
 
-    <section class="grid grid--3">
+    <section class="grid grid--3 small-cards">
       <DashboardCard title="Consultas" icon="stethoscope">
         <div class="list">
           <article v-for="item in consultations" :key="item.id" class="list__item">
@@ -115,3 +115,9 @@
     </section>
   </div>
 </template>
+
+<style scoped>
+.small-cards .chip {
+  min-width: calc((1px + 0.8rem)*2 + 7ch);
+}
+</style>

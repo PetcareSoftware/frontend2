@@ -8,7 +8,7 @@
 
 <template>
   <header class="page-header card">
-    <div>
+    <div class="page-header__titles-block">
       <div class="page-header__title-row">
         <span class="page-header__accent" :style="{ background: accent }" />
         <h1 class="page-header__title">{{ title }}</h1>

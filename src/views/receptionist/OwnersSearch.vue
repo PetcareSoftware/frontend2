@@ -21,7 +21,7 @@
     })
   );
 
-  const selectedOwner = computed(() => filteredOwners.value[0] || appStore.owners[0] || null);
+  const selectedOwner = ref(filteredOwners.value[0] || appStore.owners[0] || null);
 </script>
 
 <template>
@@ -43,7 +43,9 @@
     <section class="split">
       <div class="card">
         <div class="list">
-          <article v-for="owner in filteredOwners" :key="owner.id" class="list__item">
+          <article v-for="owner in filteredOwners" :key="owner.id" class="list__item"
+            @click="selectedOwner = owner" style="cursor: pointer;"
+          >
             <div class="list__item-main">
               <p class="list__title">{{ owner.name }}</p>
               <p class="list__subtitle">{{ owner.email }} · {{ owner.phone }}</p>

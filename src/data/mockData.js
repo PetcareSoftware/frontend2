@@ -1,10 +1,30 @@
+import { shiftDate } from "@/lib/utils";
+
+export function shiftMockDate(dateStr) {
+  return shiftDate(dateStr, '2026-05-08');
+}
+
+export function mapMockDates(item) {
+  const newItem = { ...item };
+  if (newItem.date) newItem.date = shiftMockDate(newItem.date);
+  if (newItem.nextDate) newItem.nextDate = shiftMockDate(newItem.nextDate);
+  if (newItem.birthDate) newItem.birthDate = shiftMockDate(newItem.birthDate);
+  if (newItem.createdAt) newItem.createdAt = shiftMockDate(newItem.createdAt);
+  if (newItem.followUpDate) newItem.followUpDate = shiftMockDate(newItem.followUpDate);
+  return newItem;
+};
+
+export function cloneMock(value) {
+  return value.map((item) => mapMockDates({ ...item }));
+}
+
 export const vets = [
   { id: 'v1', name: 'Dra. Valentina Torres', specialty: 'Medicina General', avatar: '' },
   { id: 'v2', name: 'Dr. Marcos Herrera', specialty: 'Cirugía', avatar: '' },
   { id: 'v3', name: 'Dra. Camila Ruiz', specialty: 'Dermatología', avatar: '' },
 ];
 
-export const owners = [
+export const owners = cloneMock([
   {
     id: 'o1',
     name: 'Ana García',
@@ -45,9 +65,33 @@ export const owners = [
     address: 'Pellegrini 678, Santa Fe',
     createdAt: '2024-04-22',
   },
-];
+  {
+    id: 'o6',
+    name: 'Roberto Gómez',
+    email: 'roberto@email.com',
+    phone: '555-0106',
+    address: 'Av. Belgrano 456, Salta',
+    createdAt: '2024-05-01',
+  },
+  {
+    id: 'o7',
+    name: 'Elena Sanz',
+    email: 'elena@email.com',
+    phone: '555-0107',
+    address: 'Calle Mitre 789, Mendoza',
+    createdAt: '2024-05-10',
+  },
+  {
+    id: 'o8',
+    name: 'Eduardo Perez',
+    email: 'eduardo@email.com',
+    phone: '555-0106',
+    address: 'Av. Valencia 678, valencia',
+    createdAt: '2026-05-12',
+  }
+]);
 
-export const pets = [
+export const pets = cloneMock([
   {
     id: 'p1',
     ownerId: 'o1',
@@ -111,9 +155,40 @@ export const pets = [
     weight: 22,
     color: 'Chocolate',
   },
-];
+  {
+    id: 'p7',
+    ownerId: 'o6',
+    name: 'Thor',
+    species: 'dog',
+    breed: 'Boxer',
+    birthDate: '2022-06-10',
+    weight: 25,
+    color: 'Marrón y blanco',
+    microchip: '985112000456789',
+  },
+  {
+    id: 'p8',
+    ownerId: 'o7',
+    name: 'Nala',
+    species: 'cat',
+    breed: 'Bengala',
+    birthDate: '2023-01-15',
+    weight: 4.1,
+    color: 'Atigrado naranja',
+  },
+  {
+    id: 'p9',
+    ownerId: 'o8',
+    name: 'Bobby',
+    species: 'dog',
+    breed: 'Labrador',
+    birthDate: '2024-07-20',
+    weight: 25,
+    color: 'Negro',
+  }
+]);
 
-export const appointments = [
+export const appointments = cloneMock([
   {
     id: 'a1',
     petId: 'p1',
@@ -216,6 +291,106 @@ export const appointments = [
   },
   {
     id: 'a11',
+    petId: 'p2',
+    ownerId: 'o1',
+    vetId: 'v1',
+    date: '2026-05-08',
+    time: '14:00',
+    reason: 'Control peso',
+    status: 'completed',
+  },
+  {
+    id: 'a12',
+    petId: 'p4',
+    ownerId: 'o3',
+    vetId: 'v2',
+    date: '2026-05-08',
+    time: '14:30',
+    reason: 'Consulta general',
+    status: 'scheduled',
+  },
+  {
+    id: 'a13',
+    petId: 'p5',
+    ownerId: 'o4',
+    vetId: 'v1',
+    date: '2026-05-09',
+    time: '10:00',
+    reason: 'Limpieza oídos',
+    status: 'scheduled',
+  },
+  {
+    id: 'a14',
+    petId: 'p6',
+    ownerId: 'o5',
+    vetId: 'v3',
+    date: '2026-05-09',
+    time: '11:00',
+    reason: 'Control anual',
+    status: 'scheduled',
+  },
+  {
+    id: 'a15',
+    petId: 'p1',
+    ownerId: 'o1',
+    vetId: 'v2',
+    date: '2026-05-10',
+    time: '09:30',
+    reason: 'Revisión dental',
+    status: 'scheduled',
+  },
+  {
+    id: 'a16',
+    petId: 'p3',
+    ownerId: 'o2',
+    vetId: 'v1',
+    date: '2026-05-11',
+    time: '15:00',
+    reason: 'Vacunación refuerzo',
+    status: 'scheduled',
+  },
+  {
+    id: 'a17',
+    petId: 'p5',
+    ownerId: 'o4',
+    vetId: 'v3',
+    date: '2026-05-12',
+    time: '16:00',
+    reason: 'Control post-operatorio',
+    status: 'scheduled',
+  },
+  {
+    id: 'a18',
+    petId: 'p7',
+    ownerId: 'o6',
+    vetId: 'v1',
+    date: '2026-05-08',
+    time: '15:30',
+    reason: 'Primer control cachorro',
+    status: 'scheduled',
+    type: 'Emergencia',
+  },
+  {
+    id: 'a19',
+    petId: 'p8',
+    ownerId: 'o7',
+    vetId: 'v2',
+    date: '2026-05-09',
+    time: '14:30',
+    reason: 'Vacunación Triple',
+    status: 'scheduled',
+  },
+  {
+    id: 'a20',
+    petId: 'p9',
+    ownerId: 'o8',
+    vetId: 'v2',
+    date: '2026-05-10',
+    time: '11:00',
+    reason: 'Seguimiento post-operatorio',
+    status: 'scheduled',
+  },
+  {
     petId: 'p6',
     ownerId: 'o5',
     vetId: 'v1',
@@ -224,9 +399,9 @@ export const appointments = [
     reason: 'Consulta general',
     status: 'completed',
   },
-];
+]);
 
-export const consultations = [
+export const consultations = cloneMock([
   {
     id: 'c1',
     appointmentId: 'a9',
@@ -260,9 +435,9 @@ export const consultations = [
     followUpDate: '2026-03-30',
     notes: 'Mejoría esperada en 5-7 días.',
   },
-];
+]);
 
-export const vaccines = [
+export const vaccines = cloneMock([
   {
     id: 'vac1',
     petId: 'p1',
@@ -309,9 +484,9 @@ export const vaccines = [
     appliedBy: 'v2',
     lot: 'LOT2025E',
   },
-];
+]);
 
-export const dewormings = [
+export const dewormings = cloneMock([
   {
     id: 'd1',
     petId: 'p1',
@@ -348,7 +523,7 @@ export const dewormings = [
     appliedBy: 'v2',
     weight: 12,
   },
-];
+]);
 
 export const timeSlots = [
   '09:00',

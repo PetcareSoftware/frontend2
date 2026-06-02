@@ -1,12 +1,15 @@
 import { timeSlots as seedTimeSlots } from '@/data/mockData';
+import { ref } from 'vue';
+import { daysFromNow, getTodayDate, getTodayShortDate } from './utils';
+export { daysFromNow , getTodayDate, getTodayShortDate };
 
 export const statusMeta = {
   scheduled: { label: 'Programada', className: 'chip--brand' },
   confirmed: { label: 'Confirmada', className: 'chip--success' },
+  waiting: { label: 'En Espera', className: 'chip--cream' },
   in_progress: { label: 'En Consulta', className: 'chip--warning' },
   completed: { label: 'Completada', className: 'chip--sage' },
   cancelled: { label: 'Cancelada', className: 'chip--danger' },
-  waiting: { label: 'En Espera', className: 'chip--cream' },
 };
 
 export const speciesMeta = {
@@ -16,6 +19,44 @@ export const speciesMeta = {
   rabbit: { label: 'Conejo', icon: 'rabbit', className: 'chip--warning' },
   other: { label: 'Otro', icon: 'paw-print', className: 'chip--brand' },
 };
+
+export const breedsBySpecies = {
+  dog: ['Golden Retriever', 'Bulldog Francés', 'Pastor Alemán', 'Labrador', 'Boxer', 'Mestizo', 'Otro'],
+  cat: ['Persa', 'Siamés', 'Bengala', 'Mestizo', 'Otro'],
+  bird: ['Canario', 'Loro', 'Otro'],
+  rabbit: ['Enano', 'Belier', 'Otro'],
+  other: ['Otro'],
+};
+
+export const petFormTemplate = {
+  name: '',
+  species: 'dog',
+  breed: 'Golden Retriever',
+  sex: 'M',
+  birthDate: '',
+  weight: '',
+  color: '',
+  notes: '',
+};
+
+export const sexCodeToName = {
+  M: 'Macho',
+  F: 'Hembra',
+}
+
+export const appointmentTransitions = {
+  scheduled: ["scheduled", "confirmed", "waiting", "in_progress", "cancelled"],
+  confirmed: ["scheduled", "confirmed", "waiting", "in_progress", "cancelled"],
+  waiting: ["confirmed", "waiting", "in_progress", "cancelled"],
+  in_progress: ["confirmed", "waiting", "in_progress", "completed", "cancelled"],
+  completed: ["in_progress", "completed"],
+  cancelled: ["scheduled", "in_progress", "cancelled"],
+};
+
+export function getSpeciesLabel(codename) {
+  const species = speciesMeta[codename];
+  return species && species.label || 'Otro';
+}
 
 export function formatDate(value, locale = 'es-VE') {
   return new Intl.DateTimeFormat(locale, {
@@ -100,9 +141,11 @@ export function getAppointmentsByDate(appointments, date) {
     .sort(sortAppointments);
 }
 
-export function getTodayAppointments(appointments, date = '2026-05-08') {
+
+export function getTodayAppointments(appointments, date = getTodayDate()) {
   return getAppointmentsByDate(appointments, date);
 }
+
 
 export function sortAppointments(left, right) {
   return `${left.date} ${left.time}`.localeCompare(`${right.date} ${right.time}`);
@@ -116,7 +159,7 @@ export function countByStatus(appointments, status) {
   return appointments.filter((appointment) => appointment.status === status).length;
 }
 
-export function countUpcoming(appointments, today = '2026-05-08') {
+export function countUpcoming(appointments, today = getTodayDate()) {
   return appointments.filter(
     (appointment) => appointment.date >= today && appointment.status !== 'cancelled'
   ).length;
@@ -159,14 +202,43 @@ export function getLatestDeworming(dewormings, petId) {
   return getPetDewormings(dewormings, petId)[0] || null;
 }
 
+export const timeSlots = seedTimeSlots;
+
+export function switchRoleLocal(item, appStore, router) {
+  appStore.setRole(item.key, item.userId || undefined);
+
+  const baseRoutes = {
+    owner: '/portal/dashboard',
+    vet: '/vet/dashboard',
+    receptionist: '/reception/dashboard',
+  };
+
+  if (baseRoutes[item.key]) {
+    router.push(baseRoutes[item.key]);
+  }
+}
+
 export function getSupply(supplies, supplyId) {
   return supplies.find((supply) => supply.id === supplyId);
 }
 
-export function daysFromNow(days) {
-  const date = new Date('2026-05-08T12:00:00');
-  date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
+export function throttle(fn, delay = 250) {
+  let wait = false;
+  return function(...args) {
+    if (!wait) {
+      fn(...args);
+
+      wait = true;
+      setTimeout(() => { wait = false; }, delay);
+    }
+  }
 }
 
-export const timeSlots = seedTimeSlots;
+export const viewSize = {
+  width: ref(window.innerWidth),
+  height: ref(window.innerHeight),
+};
+window.addEventListener("resize", throttle(() => {
+  viewSize.width.value = window.innerWidth;
+  viewSize.height.value = window.innerHeight;
+}));

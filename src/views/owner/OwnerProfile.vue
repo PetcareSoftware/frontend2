@@ -52,20 +52,24 @@
     <section class="card">
       <div class="input-row">
         <div class="input-grid">
-          <label class="field"
-            ><span>Nombre</span><input v-model="form.name" class="input" type="text"
-          /></label>
-          <label class="field"
-            ><span>Correo electrónico</span><input v-model="form.email" class="input" type="email"
-          /></label>
+          <label class="field field--required">
+            <span class="field__label">Nombre</span>
+            <input v-model="form.name" class="input" type="text"/>
+          </label>
+          <label class="field field--required">
+            <span class="field__label">Correo electrónico</span>
+            <input v-model="form.email" class="input" type="email"/>
+          </label>
         </div>
         <div class="input-grid">
-          <label class="field"
-            ><span>Teléfono</span><input v-model="form.phone" class="input" type="text"
-          /></label>
-          <label class="field"
-            ><span>Dirección</span><input v-model="form.address" class="input" type="text"
-          /></label>
+          <label class="field">
+            <span class="field__label">Teléfono</span>
+            <input v-model="form.phone" class="input" type="text"/>
+          </label>
+          <label class="field">
+            <span class="field__label">Dirección</span>
+            <input v-model="form.address" class="input" type="text"/>
+          </label>
         </div>
         <button class="btn btn--primary" type="button" @click="saveProfile">Guardar cambios</button>
       </div>

@@ -17,5 +17,5 @@ Eres un desarrollador senior experto en Vue 3 y frontend. En este proyecto debes
 ## Estilo General
 - Escribe código limpio, modular y fácil de leer.
 - Utiliza ES Modules (`import`/`export`).
-- Si debes crear funciones compartidas, colócalas en `src/lib/` o `src/utils/`.
+- Si debes crear funciones compartidas, colócalas en `src/lib/`.
 - Mantén las respuestas y documentación en Español.

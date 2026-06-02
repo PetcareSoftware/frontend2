@@ -4,7 +4,7 @@
   import PageHeader from '@/components/shared/PageHeader.vue';
   import { useAppStore } from '@/stores/useAppStore';
   import { useToastStore } from '@/stores/useToastStore';
-  import { getOwnerPets, timeSlots } from '@/lib/petcare';
+  import { formatDate, getOwnerPets, timeSlots } from '@/lib/petcare';
 
   const appStore = useAppStore();
   const toastStore = useToastStore();
@@ -18,6 +18,12 @@
     time: '09:00',
     reason: '',
     notes: '',
+  });
+
+  const occupiedSlots = computed(() => {
+    return appStore.appointments
+      .filter((a) => a.date === form.date && ['scheduled', 'confirmed'].includes(a.status))
+      .map((a) => a.time);
   });
 
   function nextStep() {
@@ -50,6 +56,12 @@
       title: 'Cita agendada',
       description: 'La solicitud quedó registrada en el sistema.',
       type: 'success',
+    });
+    appStore.addNotification({
+      title: 'Cita agendada',
+      description: `Cita programada para el ${formatDate(form.date)} a las ${form.time}.`,
+      type: 'success',
+      date: new Date().toISOString()
     });
     router.push('/portal/appointments');
   }
@@ -84,33 +96,58 @@
         </label>
       </div>
 
-      <div v-else-if="step === 2" class="input-grid" style="margin-top: 18px">
+      <div v-else-if="step === 2" class="stack" style="margin-top: 18px">
         <label class="field">
           <span>Fecha</span>
           <input v-model="form.date" class="input" type="date" />
         </label>
-        <label class="field">
+        <div class="field">
           <span>Hora</span>
-          <select v-model="form.time" class="select">
-            <option v-for="slot in timeSlots" :key="slot" :value="slot">{{ slot }}</option>
-          </select>
-        </label>
+          <div class="grid grid--3" style="gap: 8px;">
+            <button
+              v-for="slot in timeSlots"
+              :key="slot"
+              type="button"
+              class="btn"
+              :class="{
+                'btn--primary': form.time === slot,
+                'btn--ghost': form.time !== slot,
+                'btn--disabled': occupiedSlots.includes(slot)
+              }"
+              :disabled="occupiedSlots.includes(slot)"
+              @click="form.time = slot"
+              style="justify-content: center;"
+            >
+              {{ slot }}
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div v-else class="input-row" style="margin-top: 18px">
-        <label class="field">
-          <span>Motivo</span>
-          <input v-model="form.reason" class="input" type="text" placeholder="Control anual" />
-        </label>
-        <label class="field">
-          <span>Notas</span>
-          <textarea
-            v-model="form.notes"
-            class="textarea"
-            rows="4"
-            placeholder="Detalles adicionales"
-          />
-        </label>
+      <div v-else class="stack" style="margin-top: 18px">
+        <div class="card" style="background: var(--color-surface-sunken); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+          <h3 style="margin-bottom: 12px; font-size: 16px;">Resumen de la cita</h3>
+          <ul style="list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; font-size: 14px;">
+            <li><strong>Mascota:</strong> {{ pets.find(p => p.id === form.petId)?.name }}</li>
+            <li><strong>Fecha:</strong> {{ formatDate(form.date) }}</li>
+            <li><strong>Hora:</strong> {{ form.time }}</li>
+          </ul>
+        </div>
+        <div class="input-row">
+          <label class="field">
+            <span>Motivo Principal</span>
+            <input v-model="form.reason" class="input" type="text" placeholder="Ej. Control anual, Vacunación" />
+          </label>
+          <label class="field">
+            <span>Notas Adicionales</span>
+            <textarea
+              v-model="form.notes"
+              class="textarea"
+              rows="3"
+              placeholder="Detalles adicionales para el veterinario"
+            />
+          </label>
+        </div>
       </div>
 
       <div class="toolbar" style="margin-top: 20px">

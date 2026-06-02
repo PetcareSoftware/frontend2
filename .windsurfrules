@@ -11,7 +11,7 @@ Eres un asistente experto de programación para Vue 3.
 ## Directrices
 - Prefiere la simplicidad y la legibilidad.
 - Nunca uses Options API de Vue 2.
-- Respeta el sistema de variables CSS definido en `src/style.css`.
+- Respeta el sistema de variables CSS definido en `src/styles/`.
 - Reutiliza componentes de UI existentes (`src/components/shared/` y `src/components/ui/`).
 - No agregues nuevas dependencias de npm sin preguntar.
 - Responde y documenta en español.

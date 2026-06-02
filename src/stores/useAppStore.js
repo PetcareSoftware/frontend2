@@ -1,5 +1,10 @@
 import { defineStore } from 'pinia';
 import { appTemplate } from '@/config/appTemplate';
+import { OwnerService } from '@/services/api/v1/ownerService';
+import { vetService } from '@/services/api/v1/vetService';
+import { appointmentService } from '@/services/api/v1/appointmentService';
+import { notificationService } from '@/services/api/v1/notificationService';
+import { medicalRecordService } from '@/services/api/v1/medicalRecordService';
 import { normalizeInventory, normalizeInventoryItem } from '@/lib/inventory';
 import {
   unwrapList,
@@ -14,6 +19,7 @@ import {
   updatePurchaseOrderStatus,
 } from '@/services/api/v1/purchaseService';
 import {
+  cloneMock,
   vets as seedVets,
   owners as seedOwners,
   pets as seedPets,
@@ -26,21 +32,20 @@ import {
 
 const USE_MOCK_DATA = true;
 
-const clone = (value) => value.map((item) => ({ ...item }));
-
 export const useAppStore = defineStore('app', {
   state: () => ({
     role: 'owner',
     currentUserId: 'o1',
-    vets: USE_MOCK_DATA ? clone(seedVets) : [],
-    owners: USE_MOCK_DATA ? clone(seedOwners) : [],
-    pets: USE_MOCK_DATA ? clone(seedPets) : [],
-    appointments: USE_MOCK_DATA ? clone(seedAppointments) : [],
-    consultations: USE_MOCK_DATA ? clone(seedConsultations) : [],
-    vaccines: USE_MOCK_DATA ? clone(seedVaccines) : [],
-    dewormings: USE_MOCK_DATA ? clone(seedDewormings) : [],
-    inventory: USE_MOCK_DATA ? clone(seedSupplies) : [],
+    vets: USE_MOCK_DATA ? cloneMock(seedVets) : [],
+    owners: USE_MOCK_DATA ? cloneMock(seedOwners) : [],
+    pets: USE_MOCK_DATA ? cloneMock(seedPets) : [],
+    appointments: USE_MOCK_DATA ? cloneMock(seedAppointments) : [],
+    consultations: USE_MOCK_DATA ? cloneMock(seedConsultations) : [],
+    vaccines: USE_MOCK_DATA ? cloneMock(seedVaccines) : [],
+    dewormings: USE_MOCK_DATA ? cloneMock(seedDewormings) : [],
+    inventory: USE_MOCK_DATA ? cloneMock(seedSupplies) : [],
     requisitions: [],
+    notifications: [],
     status: {
       inventory: { loading: false },
       batch: { loading: false },
@@ -69,11 +74,96 @@ export const useAppStore = defineStore('app', {
         this.currentUserId = userId;
       }
     },
+    
+    // Asynchronous API Actions (Non-Auth)
+    async fetchProfile() {
+      this.isLoading = true;
+      try {
+        const profile = await OwnerService.getMe();
+        this.updateOwner(profile);
+        if (profile.pets) {
+          this.pets = profile.pets;
+        }
+      } catch (err) {
+        this.error = err.response?.data?.detail || err.message;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    
+    async fetchVetsCalendar(from, to) {
+      this.isLoading = true;
+      try {
+        const response = await vetService.getCalendar(from, to);
+        // Map the backend format to the expected state format
+        // This is a placeholder; you'll need to adapt it to your components
+        this.vets = response.data.vets || [];
+      } catch (err) {
+        this.error = err.message;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    
+    async fetchAppointments() {
+      this.isLoading = true;
+      try {
+        // Here we could fetch all appointments or just today depending on context.
+        // Assuming we want today's for the dashboard
+        const response = await appointmentService.getTodayAppointments({});
+        this.appointments = response.data.results || response.data || [];
+      } catch (err) {
+        this.error = err.message;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    async addAppointment(appointmentData) {
+      this.isLoading = true;
+      try {
+        const response = await appointmentService.scheduleAppointment(appointmentData);
+        this.appointments.push(response.data);
+        return response.data;
+      } catch (err) {
+        this.error = err.message;
+        throw err;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    async cancelAppointmentAPI(id, cancelReason = '') {
+      this.isLoading = true;
+      try {
+        await appointmentService.cancelAppointment(id, cancelReason);
+        this.appointments = this.appointments.map((item) =>
+          item.id === id ? { ...item, status: 'CANCELLED', cancellation_reason: cancelReason } : item
+        );
+        this.addNotification({
+          title: 'Cita cancelada',
+          description: `La cita ha sido cancelada${cancelReason ? ' (' + cancelReason + ')' : ''}.`,
+          type: 'info',
+          date: new Date().toISOString()
+        });
+      } catch (err) {
+        this.error = err.message;
+        throw err;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    // Fallback synchronous methods for state updates
     addOwner(owner) {
       this.owners.push(owner);
     },
     updateOwner(owner) {
-      this.owners = this.owners.map((item) => (item.id === owner.id ? owner : item));
+      if (!this.owners.find(o => o.id === owner.id)) {
+        this.owners.push(owner);
+      } else {
+        this.owners = this.owners.map((item) => (item.id === owner.id ? owner : item));
+      }
     },
     addPet(pet) {
       this.pets.push(pet);
@@ -81,17 +171,15 @@ export const useAppStore = defineStore('app', {
     updatePet(pet) {
       this.pets = this.pets.map((item) => (item.id === pet.id ? pet : item));
     },
-    addAppointment(appointment) {
-      this.appointments.push(appointment);
-    },
     updateAppointment(appointment) {
       this.appointments = this.appointments.map((item) =>
         item.id === appointment.id ? appointment : item
       );
     },
-    cancelAppointment(id) {
+    cancelAppointment(id, cancelReason = '') {
+      // Synchronous version kept for backwards compatibility during migration
       this.appointments = this.appointments.map((item) =>
-        item.id === id ? { ...item, status: 'cancelled' } : item
+        item.id === id ? { ...item, status: 'cancelled', cancelReason } : item
       );
     },
     addConsultation(consultation) {
@@ -102,6 +190,17 @@ export const useAppStore = defineStore('app', {
     },
     addDeworming(deworming) {
       this.dewormings.push(deworming);
+    },
+    addNotification(notification) {
+      this.notifications.unshift({
+        id: `n${Date.now()}`,
+        read: false,
+        ...notification
+      });
+    },
+    markNotificationAsRead(id) {
+      const notif = this.notifications.find(n => n.id === id);
+      if (notif) notif.read = true;
     },
     normalizeInventory() {
       normalizeInventory(this.inventory);

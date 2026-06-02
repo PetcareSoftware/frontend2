@@ -70,7 +70,7 @@
     <section class="card">
       <div class="input-row">
         <label class="field">
-          <span>Turno</span>
+          <span class="field__label">Turno</span>
           <select v-model="form.appointmentId" class="select">
             <option
               v-for="appointment in todayAppointments"
@@ -84,41 +84,46 @@
         </label>
 
         <div class="input-grid">
-          <label class="field"
-            ><span>Peso</span
-            ><input v-model="form.weight" class="input" type="number" min="0" step="0.1"
-          /></label>
-          <label class="field"
-            ><span>Temperatura</span
-            ><input v-model="form.temperature" class="input" type="number" min="0" step="0.1"
-          /></label>
+          <label class="field">
+            <span class="field__label">Peso</span>
+            <input v-model="form.weight" class="input" type="number" min="0" step="0.1"/>
+          </label>
+          <label class="field">
+            <span class="field__label">Temperatura</span>
+            <input v-model="form.temperature" class="input" type="number" min="0" step="0.1"/>
+          </label>
         </div>
 
-        <label class="field"
-          ><span>Síntomas</span><textarea v-model="form.symptoms" class="textarea" rows="3" />
+        <label class="field">
+          <span class="field__label">Síntomas</span>
+          <textarea v-model="form.symptoms" class="textarea" rows="3"></textarea>
         </label>
-        <label class="field"
-          ><span>Diagnóstico *</span><textarea v-model="form.diagnosis" class="textarea" rows="3" />
+        <label class="field field--required">
+          <span class="field__label">Diagnóstico</span>
+          <textarea v-model="form.diagnosis" class="textarea" rows="3"></textarea>
         </label>
-        <label class="field"
-          ><span>Tratamiento *</span><textarea v-model="form.treatment" class="textarea" rows="3" />
+        <label class="field field--required">
+          <span class="field__label">Tratamiento</span>
+          <textarea v-model="form.treatment" class="textarea" rows="3"></textarea>
         </label>
-        <label class="field"
-          ><span>Prescripciones</span
-          ><textarea
+        <label class="field">
+          <span class="field__label">Prescripciones</span>
+          <textarea
             v-model="form.prescriptions"
             class="textarea"
             rows="3"
             placeholder="Una por línea"
-          />
+          ></textarea>
         </label>
         <div class="input-grid">
-          <label class="field"
-            ><span>Seguimiento</span><input v-model="form.followUpDate" class="input" type="date"
-          /></label>
-          <label class="field"
-            ><span>Notas</span><input v-model="form.notes" class="input" type="text"
-          /></label>
+          <label class="field">
+            <span class="field__label">Seguimiento</span>
+            <input v-model="form.followUpDate" class="input" type="date"/>
+          </label>
+          <label class="field">
+            <span class="field__label">Notas</span>
+            <input v-model="form.notes" class="input" type="text"/>
+          </label>
         </div>
         <button class="btn btn--primary" type="button" @click="saveConsultation">
           Guardar consulta

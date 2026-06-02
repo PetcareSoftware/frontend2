@@ -12,6 +12,7 @@
     getVet,
     getAppointmentStats,
     formatDate,
+    getTodayShortDate,
   } from '@/lib/petcare';
 
   const appStore = useAppStore();
@@ -20,7 +21,7 @@
     getAppointmentsByVet(appStore.appointments, currentVetId.value)
   );
   const todayAppointments = computed(() =>
-    vetAppointments.value.filter((appointment) => appointment.date === '2026-05-08')
+    vetAppointments.value.filter((appointment) => appointment.date === getTodayShortDate())
   );
   const stats = computed(() => getAppointmentStats(todayAppointments.value));
 </script>
@@ -67,6 +68,9 @@
               <div class="list__item-main">
                 <p class="list__title">
                   {{ appointment.time }} · {{ getPet(appStore.pets, appointment.petId)?.name }}
+                  <span v-if="appointment.type === 'Emergencia'" class="chip chip--danger chip--sm chip--shift-up" style="margin-left: 8px;">
+                    Emergencia{{appointment.priority ? ` (${appointment.priority})`: ''}}
+                  </span>
                 </p>
                 <p class="list__subtitle">{{ appointment.reason }}</p>
               </div>
@@ -88,17 +92,17 @@
             </p>
           </div>
           <div class="summary-grid">
-            <article class="card">
-              <p class="eyebrow">Agenda</p>
+            <article class="summary-grid__item card">
+              <p class="summary-grid__item-title eyebrow">Agenda</p>
               <strong>{{ vetAppointments.length }}</strong>
             </article>
-            <article class="card">
-              <p class="eyebrow">Hoy</p>
+            <article class="summary-grid__item card">
+              <p class="summary-grid__item-title eyebrow">Hoy</p>
               <strong>{{ todayAppointments.length }}</strong>
             </article>
-            <article class="card">
-              <p class="eyebrow">Fecha</p>
-              <strong>{{ formatDate('2026-05-08') }}</strong>
+            <article class="summary-grid__item card">
+              <p class="summary-grid__item-title eyebrow">Fecha</p>
+              <strong>{{ formatDate(getTodayShortDate()) }}</strong>
             </article>
           </div>
         </div>

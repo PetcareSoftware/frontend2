@@ -12,7 +12,6 @@ export const appTemplate = {
     owner: [
       { to: '/portal/dashboard', icon: 'house', label: 'Inicio' },
       { to: '/portal/appointments', icon: 'calendar-days', label: 'Mis Citas' },
-      { to: '/portal/schedule', icon: 'calendar-plus', label: 'Agendar Cita' },
       { to: '/portal/pets', icon: 'paw-print', label: 'Mis Mascotas' },
       { to: '/portal/history', icon: 'clock-3', label: 'Historial' },
       { to: '/portal/profile', icon: 'user-round', label: 'Mi Perfil' },

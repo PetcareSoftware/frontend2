@@ -1,67 +1,66 @@
 <script setup>
-  import { computed, reactive } from 'vue';
+  import { ref, computed } from 'vue';
+  import { useRouter } from 'vue-router';
   import PageHeader from '@/components/shared/PageHeader.vue';
   import PetAvatar from '@/components/shared/PetAvatar.vue';
   import DashboardCard from '@/components/shared/DashboardCard.vue';
+  import PetForm from '@/components/shared/PetForm.vue';
+  import PetDetail from '@/components/shared/PetDetail.vue';
   import { useAppStore } from '@/stores/useAppStore';
-  import { useToastStore } from '@/stores/useToastStore';
   import {
     formatDate,
     getLatestConsultation,
-    getLatestDeworming,
     getLatestVaccine,
     getOwnerPets,
+    getSpeciesLabel,
+    viewSize,
   } from '@/lib/petcare';
 
   const appStore = useAppStore();
-  const toastStore = useToastStore();
-  const pets = computed(() => getOwnerPets(appStore.pets, appStore.currentUserId));
+  const router = useRouter();
+  const viewWidth = viewSize.width;
 
-  const form = reactive({
-    name: '',
-    species: 'dog',
-    breed: '',
-    birthDate: '',
-    weight: '',
-    color: '',
-    notes: '',
-  });
+  const pets = computed(() => getOwnerPets(appStore.pets, appStore.currentUserId));
+  const currentPet = ref(null);
+  const isViewing = ref(true);
+
+  function viewPet(pet) {
+    if (viewWidth.value > 1180) {
+      isViewing.value = true;
+      currentPet.value = pet;
+    } else {
+      router.push(`/portal/pets/${pet.id}`);
+    }
+  }
+
+  function editPet(pet) {
+    if (viewWidth.value > 1180) {
+      isViewing.value = false;
+      currentPet.value = pet;
+    } else {
+      router.push(`/portal/pets/${pet.id}/edit`);
+    }
+  }
 
   function addPet() {
-    if (!form.name || !form.breed || !form.birthDate) {
-      toastStore.push({ title: 'Completa los campos requeridos', type: 'error' });
-      return;
+    if (viewWidth.value > 1180) {
+      isViewing.value = false;
+      currentPet.value = null;
+    } else {
+      router.push('/portal/pets/add');
     }
-
-    appStore.addPet({
-      id: `p${Date.now()}`,
-      ownerId: appStore.currentUserId,
-      name: form.name,
-      species: form.species,
-      breed: form.breed,
-      birthDate: form.birthDate,
-      weight: Number(form.weight) || 0,
-      color: form.color,
-      notes: form.notes,
-    });
-
-    toastStore.push({
-      title: 'Mascota agregada',
-      description: `${form.name} se sumó al perfil.`,
-      type: 'success',
-    });
-    form.name = '';
-    form.breed = '';
-    form.birthDate = '';
-    form.weight = '';
-    form.color = '';
-    form.notes = '';
   }
 </script>
 
 <template>
   <div class="stack">
-    <PageHeader title="Mis Mascotas" subtitle="Gestión de mascotas vinculadas al propietario." />
+    <PageHeader title="Mis Mascotas" subtitle="Gestión de mascotas vinculadas al propietario.">
+      <template #actions>
+        <button class="btn btn--primary" type="button" @click="addPet">
+          + Agregar Mascota
+        </button>
+      </template>
+    </PageHeader>
 
     <section class="split">
       <DashboardCard title="Mascotas registradas" icon="paw-print">
@@ -82,58 +81,55 @@
                 </p>
               </div>
             </div>
-            <div class="stack" style="justify-items: end; gap: 8px">
-              <span class="chip chip--sage">{{ pet.species }}</span>
+            <div class="stack pet-status">
+              <span class="chip chip--sage">{{ getSpeciesLabel(pet.species) }}</span>
               <span class="muted"
                 >Vacunas:
                 {{ getLatestVaccine(appStore.vaccines, pet.id) ? 'Activas' : 'Sin datos' }}</span
               >
+              <div class="pet-actions">
+                <button class="btn btn--soft pet-action-btn" type="button" @click="viewPet(pet)">Ver detalle</button>
+                <button class="btn btn--brand pet-action-btn" type="button" @click="editPet(pet)">Editar</button>
+              </div>
             </div>
           </article>
           <p v-if="!pets.length" class="muted">Todavía no hay mascotas asociadas.</p>
         </div>
       </DashboardCard>
 
-      <section class="card">
-        <h2 class="section__title">Agregar mascota</h2>
-        <div class="input-row" style="margin-top: 16px">
-          <label class="field"
-            ><span>Nombre *</span><input v-model="form.name" class="input" type="text"
-          /></label>
-          <div class="input-grid">
-            <label class="field"
-              ><span>Especie</span
-              ><select v-model="form.species" class="select">
-                <option value="dog">Perro</option>
-                <option value="cat">Gato</option>
-                <option value="bird">Ave</option>
-                <option value="rabbit">Conejo</option>
-                <option value="other">Otro</option>
-              </select></label
-            >
-            <label class="field"
-              ><span>Raza *</span><input v-model="form.breed" class="input" type="text"
-            /></label>
-          </div>
-          <div class="input-grid">
-            <label class="field"
-              ><span>Fecha de nacimiento *</span
-              ><input v-model="form.birthDate" class="input" type="date"
-            /></label>
-            <label class="field"
-              ><span>Peso</span
-              ><input v-model="form.weight" class="input" type="number" min="0" step="0.1"
-            /></label>
-          </div>
-          <label class="field"
-            ><span>Color</span><input v-model="form.color" class="input" type="text"
-          /></label>
-          <label class="field"
-            ><span>Notas</span><textarea v-model="form.notes" class="textarea" rows="4" />
-          </label>
-          <button class="btn btn--primary" type="button" @click="addPet">Guardar mascota</button>
-        </div>
-      </section>
+      <PetDetail v-if="isViewing" class="pet-form" :pet="currentPet"/>
+      <PetForm v-else class="pet-form" :pet="currentPet"
+        @cancel="currentPet = null" @save="currentPet = null"
+      />
     </section>
   </div>
 </template>
+
+<style scoped>
+.pets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pet-status {
+  justify-items: end;
+  gap: 8px;
+}
+
+.pet-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.pet-action-btn {
+  padding: 4px 12px;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 1180px) {
+  .pet-form {
+    display: none;
+  }
+}
+</style>

@@ -3,14 +3,14 @@
   import PageHeader from '@/components/shared/PageHeader.vue';
   import { useAppStore } from '@/stores/useAppStore';
   import { useToastStore } from '@/stores/useToastStore';
-  import { formatDate } from '@/lib/petcare';
+  import { formatDate, getTodayShortDate } from '@/lib/petcare';
 
   const appStore = useAppStore();
   const toastStore = useToastStore();
   const form = reactive({
     petId: appStore.pets[0]?.id || '',
     name: '',
-    date: '2026-05-08',
+    date: getTodayShortDate(),
     nextDate: '2026-06-08',
     lot: '',
     notes: '',
@@ -49,36 +49,40 @@
   <div class="stack">
     <PageHeader title="Vacunas" subtitle="Gestión y programación de vacunas por mascota." />
 
-    <section class="split">
+    <section class="split split--wide-side">
       <section class="card">
         <div class="input-row">
-          <label class="field"
-            ><span>Mascota</span
-            ><select v-model="form.petId" class="select">
+          <label class="field field--required">
+            <span class="field__label">Mascota</span>
+            <select v-model="form.petId" class="select">
               <option v-for="pet in appStore.pets" :key="pet.id" :value="pet.id">
                 {{ pet.name }}
               </option>
-            </select></label
-          >
+            </select>
+          </label>
           <div class="input-grid">
-            <label class="field"
-              ><span>Nombre</span
-              ><input v-model="form.name" class="input" type="text" placeholder="Séxtuple"
-            /></label>
-            <label class="field"
-              ><span>Lote</span><input v-model="form.lot" class="input" type="text"
-            /></label>
+            <label class="field field--required">
+              <span class="field__label">Nombre</span>
+              <input v-model="form.name" class="input" type="text" placeholder="Séxtuple"/>
+            </label>
+            <label class="field">
+              <span class="field__label">Lote</span>
+              <input v-model="form.lot" class="input" type="text"/>
+            </label>
           </div>
           <div class="input-grid">
-            <label class="field"
-              ><span>Fecha</span><input v-model="form.date" class="input" type="date"
-            /></label>
-            <label class="field"
-              ><span>Próxima fecha</span><input v-model="form.nextDate" class="input" type="date"
-            /></label>
+            <label class="field field--required">
+              <span class="field__label">Fecha</span>
+              <input v-model="form.date" class="input" type="date"/>
+            </label>
+            <label class="field field--required">
+              <span class="field__label">Próxima fecha</span>
+              <input v-model="form.nextDate" class="input" type="date"/>
+            </label>
           </div>
-          <label class="field"
-            ><span>Notas</span><textarea v-model="form.notes" class="textarea" rows="3" />
+          <label class="field">
+            <span class="field__label">Notas</span>
+            <textarea v-model="form.notes" class="textarea" rows="3"></textarea>
           </label>
           <button class="btn btn--primary" type="button" @click="saveVaccine">
             Guardar vacuna
