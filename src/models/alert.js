@@ -2,35 +2,35 @@ import { ValidationError } from './utils.js';
 
 
 export class Alert {
-  supplyId = null;
-  supplyName = '';
-  supplySku = '';
-  alertType = '';
-  severity = '';
-  message = '';
-  currentValue = null;
-  thresholdValue = null;
-  daysRemaining = null;
-  batchId = null;
-  lotNumber = '';
-
-  constructor(data) {
-    this.supplyId = data.supplyId ?? this.supplyId;
-    this.supplyName = data.supplyName || this.supplyName;
-    this.supplySku = data.supplySku || this.supplySku;
-    this.alertType = data.alertType || this.alertType;
-    this.severity = data.severity || this.severity;
-    this.message = data.message || this.message;
-    this.currentValue = data.currentValue ?? this.currentValue;
-    this.thresholdValue = data.thresholdValue ?? this.thresholdValue;
-    this.daysRemaining = data.daysRemaining ?? this.daysRemaining;
-    this.batchId = data.batchId ?? this.batchId;
-    this.lotNumber = data.lotNumber || this.lotNumber;
+  constructor({
+    supplyId,
+    supplyName,
+    supplySku,
+    alertType,
+    severity,
+    message,
+    currentValue,
+    thresholdValue,
+    daysRemaining,
+    batchId,
+    lotNumber
+  } = {}) {
+    this.supplyId = supplyId ?? null;
+    this.supplyName = supplyName || '';
+    this.supplySku = supplySku || '';
+    this.alertType = alertType || '';
+    this.severity = severity || '';
+    this.message = message || '';
+    this.currentValue = currentValue ?? 0;
+    this.thresholdValue = thresholdValue ?? 0;
+    this.daysRemaining = daysRemaining ?? null;
+    this.batchId = batchId ?? null;
+    this.lotNumber = lotNumber || '';
   }
 
   validate() {
     if (!this.supplyId) {
-      throw new ValidationError('Insumo inválido', 'supplyId');
+      throw new ValidationError('Insumo invï¿½lido', 'supplyId');
     }
 
     return true;
@@ -48,7 +48,7 @@ export class Alert {
       threshold_value: this.thresholdValue,
       days_remaining: this.daysRemaining,
       batch_id: this.batchId,
-      lot_number: this.lotNumber,
+      lot_number: this.lotNumber
     };
   }
 
