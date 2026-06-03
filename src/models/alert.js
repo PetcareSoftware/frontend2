@@ -14,18 +14,30 @@ export class Alert {
   batchId = null;
   lotNumber = '';
 
-  constructor(data) {
-    this.supplyId = data.supplyId ?? this.supplyId;
-    this.supplyName = data.supplyName || this.supplyName;
-    this.supplySku = data.supplySku || this.supplySku;
-    this.alertType = data.alertType || this.alertType;
-    this.severity = data.severity || this.severity;
-    this.message = data.message || this.message;
-    this.currentValue = data.currentValue ?? this.currentValue;
-    this.thresholdValue = data.thresholdValue ?? this.thresholdValue;
-    this.daysRemaining = data.daysRemaining ?? this.daysRemaining;
-    this.batchId = data.batchId ?? this.batchId;
-    this.lotNumber = data.lotNumber || this.lotNumber;
+  constructor({
+    supplyId,
+    supplyName,
+    supplySku,
+    alertType,
+    severity,
+    message,
+    currentValue,
+    thresholdValue,
+    daysRemaining,
+    batchId,
+    lotNumber,
+  }) {
+    this.supplyId = supplyId ?? this.supplyId;
+    this.supplyName = supplyName || this.supplyName;
+    this.supplySku = supplySku || this.supplySku;
+    this.alertType = alertType || this.alertType;
+    this.severity = severity || this.severity;
+    this.message = message || this.message;
+    this.currentValue = currentValue ?? this.currentValue;
+    this.thresholdValue = thresholdValue ?? this.thresholdValue;
+    this.daysRemaining = daysRemaining ?? this.daysRemaining;
+    this.batchId = batchId ?? this.batchId;
+    this.lotNumber = lotNumber || this.lotNumber;
   }
 
   validate() {
@@ -37,7 +49,7 @@ export class Alert {
   }
 
   toApi() {
-    return {
+    const data = {
       supply_id: this.supplyId,
       supply_name: this.supplyName,
       supply_sku: this.supplySku,
@@ -50,6 +62,8 @@ export class Alert {
       batch_id: this.batchId,
       lot_number: this.lotNumber,
     };
+
+    return data;
   }
 
   static fromApi(data) {

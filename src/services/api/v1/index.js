@@ -3,8 +3,10 @@ export {
   InventoryService,
   SUPPLIES_BASE,
   BATCHES_BASE,
+  CONSUME_BASE,
   listSupplies,
   createBatch,
+  consumeSupply,
 } from './inventoryService.js';
 export {
   PurchaseService,
@@ -15,5 +17,4 @@ export {
   updatePurchaseOrderStatus,
   listSuppliers,
 } from './purchaseService.js';
-export { ConsumptionService, CONSUME_BASE, consumeSupply } from './consumptionService.js';
 export { AlertService, ALERTS_BASE, listCriticalAlerts } from './alertService.js';

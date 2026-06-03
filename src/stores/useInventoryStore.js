@@ -116,7 +116,7 @@ export const useInventoryStore = defineStore('inventory', () => {
           ...newSupply,
           id: newSupply.id ?? `s${Date.now()}`,
           category: newSupply.category ?? newSupply.type,
-          min_stock: newSupply.minStock ?? newSupply.umbral ?? 10,
+          min_stock: newSupply.minStock ?? 10,
         });
 
         saveInStore(created);

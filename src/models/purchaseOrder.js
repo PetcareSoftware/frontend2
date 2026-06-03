@@ -50,7 +50,7 @@ export class PurchaseOrder {
       throw new ValidationError('Proveedor requerido', 'supplierId');
     }
     if (!this.items.length) {
-      throw new ValidationError('Debe incluir al menos un ítem', 'items');
+      throw new ValidationError('Debe incluir al menos un item', 'items');
     }
     this.items.forEach((item) => item.validate());
 
@@ -58,10 +58,20 @@ export class PurchaseOrder {
   }
 
   toApi() {
-    return {
-      proveedor: this.supplierId,
+    const data = {
+      id: this.id,
+      supplierId: this.supplierId,
+      supplierName: this.supplierName,
+      managerId: this.managerId,
+      status: this.status,
+      estado: this.estado,
+      total: this.total,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
       items: this.items.map((item) => item.toApi()),
     };
+
+    return data;
   }
 
   static fromApi(data) {
@@ -73,7 +83,7 @@ export class PurchaseOrder {
       supplierName: data.supplier_name ?? '',
       managerId: data.manager ?? data.manager_id ?? data.managerId ?? null,
       status,
-      estado: this.STATUS_UI[status] ?? data.status_display ?? data.estado ?? status,
+      estado: PurchaseOrder.STATUS_UI[status] ?? data.status_display ?? data.estado ?? status,
       total: Number(data.total_cost ?? data.total ?? 0),
       createdAt: data.created_at ?? null,
       updatedAt: data.updated_at ?? null,
@@ -82,11 +92,14 @@ export class PurchaseOrder {
   }
 
   toApiCreate() {
-    return this.toApi();
+    return {
+      proveedor: this.supplierId,
+      items: this.items.map((item) => item.toApiCreate()),
+    };
   }
 
   toApiStatusUpdate(estado) {
-    return { status: this.constructor.STATUS_TO_API[estado] ?? estado };
+    return { status: PurchaseOrder.STATUS_TO_API[estado] ?? estado };
   }
 
   equals(other) {

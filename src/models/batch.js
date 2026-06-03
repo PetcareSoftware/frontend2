@@ -35,13 +35,13 @@ export class Batch {
 
   validate() {
     if (!this.batch) {
-      throw new ValidationError('Código de lote inválido', 'batch');
+      throw new ValidationError('Codigo de lote invalido', 'batch');
     }
     if (!DATE_REGEXP.test(this.expirationDate)) {
-      throw new ValidationError('Fecha de vencimiento inválida', 'expirationDate');
+      throw new ValidationError('Fecha de vencimiento invalida', 'expirationDate');
     }
     if (!(Number.isInteger(this.quantity) && this.quantity > 0)) {
-      throw new ValidationError('Cantidad inválida', 'quantity');
+      throw new ValidationError('Cantidad invalida', 'quantity');
     }
 
     return true;
@@ -49,17 +49,18 @@ export class Batch {
 
   toApi() {
     const data = {
-      insumoId: this.supplyId,
-      quantity: this.quantity,
+      id: this.id,
+      supplyId: this.supplyId,
       batch: this.batch,
       expirationDate: this.expirationDate,
-      details: '',
-      observations: this.observations || '',
+      quantity: this.quantity,
+      initialStock: this.initialStock,
+      acquisitionCost: this.acquisitionCost,
+      createdAt: this.createdAt,
+      supplyName: this.supplyName,
+      supplySku: this.supplySku,
+      observations: this.observations,
     };
-
-    if (this.acquisitionCost != null) {
-      data.acquisitionCost = this.acquisitionCost;
-    }
 
     return data;
   }
@@ -81,7 +82,20 @@ export class Batch {
   }
 
   toApiCreate() {
-    return this.toApi();
+    const data = {
+      insumoId: this.supplyId,
+      quantity: this.quantity,
+      batch: this.batch,
+      expirationDate: this.expirationDate,
+      details: '',
+      observations: this.observations || '',
+    };
+
+    if (this.acquisitionCost != null) {
+      data.acquisitionCost = this.acquisitionCost;
+    }
+
+    return data;
   }
 
   equals(other) {

@@ -1,11 +1,13 @@
 import api from './api.js';
 import { Supply } from '@/models/supply.js';
 import { Batch } from '@/models/batch.js';
-import { unwrapApiList } from '@/models/utils.js';
+import { Consumption } from '@/models/consumption.js';
+import { unwrapApiList } from '@/lib/utils.js';
 
 
 export const SUPPLIES_BASE = 'supplies/';
 export const BATCHES_BASE = 'batches/';
+export const CONSUME_BASE = 'consume/';
 
 
 export class InventoryService {
@@ -53,6 +55,13 @@ export class InventoryService {
 
     return null;
   }
+
+  static async consume(consumption) {
+    const payload = consumption instanceof Consumption ? consumption.toApiCreate() : consumption;
+    const response = await api.post(CONSUME_BASE, payload);
+
+    return Consumption.fromApi(response.data);
+  }
 }
 
 /** @deprecated Compatibilidad con useAppStore. */
@@ -67,7 +76,7 @@ export async function listSupplies(params = {}) {
     description: supply.description,
     quantity: supply.quantity,
     unitCost: supply.unitCost,
-    umbral: supply.minStock,
+    minStock: supply.minStock,
     batches: supply.batches.map((batch) => ({
       batch: batch.batch,
       expirationDate: batch.expirationDate,
@@ -83,4 +92,17 @@ export async function createBatch(batch) {
   const created = await InventoryService.createBatch(normalized);
 
   return created ? created.toApi() : null;
+}
+
+/** @deprecated Compatibilidad con useAppStore. */
+export async function consumeSupply(payload) {
+  const normalized = payload instanceof Consumption ? payload : Consumption.fromApi(payload);
+  const result = await InventoryService.consume(normalized);
+
+  return {
+    message: result.message,
+    supply_id: result.supplyId,
+    name: result.name,
+    remaining_stock: result.remainingStock,
+  };
 }

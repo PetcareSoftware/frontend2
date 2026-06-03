@@ -29,4 +29,20 @@ export class Vaccination extends Treatment {
 
     return true;
   }
+
+  toApi() {
+    const data = super.toApi();
+    data.name = this.name;
+    data.lot = this.lot;
+    data.notes = this.notes;
+
+    return data;
+  }
+
+  toApiCreate() {
+    const data = this.toApi();
+    delete data.id;
+
+    return data;
+  }
 }

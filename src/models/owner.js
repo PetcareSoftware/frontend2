@@ -60,6 +60,14 @@ export class Owner extends User {
     });
   }
 
+  toApiCreate() {
+    const data = this.toApi();
+    delete data.id;
+    delete data.createdAt;
+
+    return data;
+  }
+
   toApiUpdateProfile() {
     let data = this.toApi();
     data = {

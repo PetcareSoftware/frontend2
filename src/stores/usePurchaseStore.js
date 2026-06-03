@@ -3,11 +3,16 @@ import { ref, computed, watch } from 'vue';
 import { PurchaseService } from '@/services/api/v1/purchaseService';
 import { PurchaseOrder } from '@/models/purchaseOrder.js';
 import { PurchaseOrderItem } from '@/models/purchaseOrderItem.js';
+import { purchaseOrders as seedPurchaseOrders } from '@/data/mockData';
 import { findReplace } from '@/lib/utils';
 import { USE_MOCK_DATA, getSelectedById, getLocked, getLockWatcher } from './utils';
 
 
-const mockPurchaseOrders = [];
+function cloneSeedPurchaseOrders() {
+  return seedPurchaseOrders.map((entry) => PurchaseOrder.fromApi(entry));
+}
+
+let mockPurchaseOrders = cloneSeedPurchaseOrders();
 
 
 export const usePurchaseStore = defineStore('purchase', () => {
@@ -100,13 +105,30 @@ export const usePurchaseStore = defineStore('purchase', () => {
 
     try {
       if (USE_MOCK_DATA) {
-        const created = PurchaseOrder.fromApi({
-          ...newOrder,
-          id: newOrder.id ?? `PO-${Date.now()}`,
-          status: 'REQUESTED',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
+        const created = newOrder instanceof PurchaseOrder ?
+          new PurchaseOrder({
+            id: newOrder.id ?? `PO-${Date.now()}`,
+            supplierId: newOrder.supplierId,
+            supplierName: newOrder.supplierName,
+            managerId: newOrder.managerId,
+            status: 'REQUESTED',
+            estado: 'Pendiente',
+            total: newOrder.total,
+            items: newOrder.items,
+            createdAt: newOrder.createdAt ?? new Date().toISOString(),
+            updatedAt: newOrder.updatedAt ?? new Date().toISOString(),
+          }) :
+          new PurchaseOrder({
+            id: `PO-${Date.now()}`,
+            supplierId: newOrder.supplierId,
+            supplierName: newOrder.supplierName ?? '',
+            status: 'REQUESTED',
+            estado: 'Pendiente',
+            total: newOrder.total ?? 0,
+            items: newOrder.items ?? [],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          });
 
         mockPurchaseOrders.push(created);
         saveInStore(created);
@@ -172,18 +194,23 @@ export const usePurchaseStore = defineStore('purchase', () => {
     const orderItems = items.map((item) => {
       const supply = inventoryGetter(item.supplyId ?? item.insumoId);
 
-      return PurchaseOrderItem.fromApi({
-        insumoId: item.supplyId ?? item.insumoId,
-        nombre: supply?.name ?? item.nombre,
-        cantidad: Number(item.quantity),
-        costoUnitario: Number(supply?.unitCost ?? item.unitCost ?? 1),
+      return new PurchaseOrderItem({
+        supplyId: item.supplyId ?? item.insumoId,
+        supplyName: supply?.name ?? item.nombre ?? '',
+        supplySku: supply?.sku ?? '',
+        quantity: Number(item.quantity),
+        unitCost: Number(supply?.unitCost ?? item.unitCost ?? 1),
       });
     });
+    const total = orderItems.reduce((sum, line) => sum + line.quantity * line.unitCost, 0);
 
-    return PurchaseOrder.fromApi({
-      proveedor: supplierId,
-      items: orderItems.map((entry) => entry.toApi()),
+    return new PurchaseOrder({
+      supplierId,
+      supplierName: '',
       status: 'REQUESTED',
+      estado: 'Pendiente',
+      total,
+      items: orderItems,
     });
   }
 

@@ -55,4 +55,30 @@ export class Appointment {
 
     return true;
   }
+
+  toApi() {
+    const data = {
+      id: this.id,
+      petId: this.petId,
+      ownerId: this.ownerId,
+      vetId: this.vetId,
+      date: this.date,
+      time: this.time,
+      reason: this.reason,
+      status: this.status,
+    };
+
+    return data;
+  }
+
+  toApiCreate() {
+    const data = this.toApi();
+    delete data.id;
+
+    return data;
+  }
+
+  toApiUpdate() {
+    return this.toApiCreate();
+  }
 }

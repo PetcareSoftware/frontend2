@@ -25,6 +25,18 @@ export function equalsByProperties(first, second, props, mode = 'and') {
   return reducer(key => first[key] === second[key]);
 }
 
+/** Normaliza respuestas paginadas de Django REST o arrays directos. */
+export function unwrapApiList(data) {
+  if (Array.isArray(data)) {
+    return data;
+  }
+  if (data?.results && Array.isArray(data.results)) {
+    return data.results;
+  }
+
+  return [];
+}
+
 
 // Fechas
 

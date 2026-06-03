@@ -77,4 +77,35 @@ export class Consultation {
 
     return true;
   }
+
+  toApi() {
+    const data = {
+      id: this.id,
+      appointmentId: this.appointmentId,
+      petId: this.petId,
+      vetId: this.vetId,
+      date: this.date,
+      weight: this.weight,
+      temperature: this.temperature,
+      symptoms: this.symptoms,
+      diagnosis: this.diagnosis,
+      treatment: this.treatment,
+      prescriptions: this.prescriptions,
+      followUpDate: this.followUpDate,
+      notes: this.notes,
+    };
+
+    return data;
+  }
+
+  toApiCreate() {
+    const data = this.toApi();
+    delete data.id;
+
+    return data;
+  }
+
+  toApiUpdate() {
+    return this.toApiCreate();
+  }
 }

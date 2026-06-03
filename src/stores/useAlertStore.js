@@ -11,7 +11,7 @@ function mapSeedAlerts() {
   return seedSupplies.flatMap((supply) => {
     const { alertClass, messages } = evaluateProductAlertState({
       ...supply,
-      umbral: supply.minStock,
+      minStock: supply.minStock,
     });
 
     if (alertClass === 'normal' || !messages.length) {

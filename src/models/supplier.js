@@ -49,6 +49,17 @@ export class Supplier {
     });
   }
 
+  toApiCreate() {
+    const data = {
+      name: this.name,
+      email: this.email,
+      phone: this.phone,
+      address: this.address,
+    };
+
+    return data;
+  }
+
   equals(other) {
     return this.id != null && other?.id != null && this.id === other.id;
   }

@@ -1,6 +1,6 @@
 import api from './api.js';
 import { Alert } from '@/models/alert.js';
-import { unwrapApiList } from '@/models/utils.js';
+import { unwrapApiList } from '@/lib/utils.js';
 
 
 export const ALERTS_BASE = 'alerts/';

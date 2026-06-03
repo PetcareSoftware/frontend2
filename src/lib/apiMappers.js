@@ -22,7 +22,7 @@ export function mapSupplyFromApi(supply) {
     type: supply.category ?? supply.type ?? '',
     quantity: Number(supply.current_stock ?? supply.quantity ?? 0),
     unitCost: Number(supply.unit_cost ?? supply.unitCost ?? 0),
-    minStock: Number(supply.min_stock_alert ?? supply.minStock ?? 10),
+    minStock: Number(supply.min_stock ?? supply.minStock ?? supply.umbral ?? 10),
     batches: Array.isArray(batches) ? batches.map(mapBatchFromApi) : [],
   };
 }

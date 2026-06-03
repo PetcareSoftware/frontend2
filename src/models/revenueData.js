@@ -20,4 +20,17 @@ export class RevenueData {
 
     return true;
   }
+
+  toApi() {
+    const data = {
+      label: this.label,
+      amount: this.amount,
+    };
+
+    return data;
+  }
+
+  toApiCreate() {
+    return this.toApi();
+  }
 }

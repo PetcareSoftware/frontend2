@@ -23,22 +23,26 @@ export class PurchaseOrderItem {
       throw new ValidationError('Insumo requerido', 'supplyId');
     }
     if (!(Number.isInteger(this.quantity) && this.quantity > 0)) {
-      throw new ValidationError('Cantidad inválida', 'quantity');
+      throw new ValidationError('Cantidad invalida', 'quantity');
     }
     if (!(typeof this.unitCost === 'number' && this.unitCost > 0)) {
-      throw new ValidationError('Costo unitario inválido', 'unitCost');
+      throw new ValidationError('Costo unitario invalido', 'unitCost');
     }
 
     return true;
   }
 
   toApi() {
-    return {
-      insumoId: this.supplyId,
-      nombre: this.supplyName || undefined,
-      cantidad: this.quantity,
-      costoUnitario: this.unitCost,
+    const data = {
+      id: this.id,
+      supplyId: this.supplyId,
+      supplyName: this.supplyName,
+      supplySku: this.supplySku,
+      quantity: this.quantity,
+      unitCost: this.unitCost,
     };
+
+    return data;
   }
 
   static fromApi(data) {
@@ -50,6 +54,20 @@ export class PurchaseOrderItem {
       quantity: Number(data.quantity_requested ?? data.cantidad ?? data.quantity ?? 0),
       unitCost: Number(data.unit_cost ?? data.costoUnitario ?? data.unitCost ?? 0),
     });
+  }
+
+  toApiCreate() {
+    const data = {
+      insumoId: this.supplyId,
+      cantidad: this.quantity,
+      costoUnitario: this.unitCost,
+    };
+
+    if (this.supplyName) {
+      data.nombre = this.supplyName;
+    }
+
+    return data;
   }
 
   equals(other) {

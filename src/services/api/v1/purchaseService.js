@@ -1,7 +1,7 @@
 import api from './api.js';
 import { PurchaseOrder } from '@/models/purchaseOrder.js';
 import { Supplier } from '@/models/supplier.js';
-import { unwrapApiList } from '@/models/utils.js';
+import { unwrapApiList } from '@/lib/utils.js';
 
 
 export const PURCHASE_ORDERS_BASE = 'purchase-orders/';

@@ -23,7 +23,7 @@ export class Consumption {
       throw new ValidationError('Insumo requerido', 'supplyId');
     }
     if (!(Number.isInteger(this.quantity) && this.quantity > 0)) {
-      throw new ValidationError('Cantidad inválida', 'quantity');
+      throw new ValidationError('Cantidad invalida', 'quantity');
     }
 
     return true;
@@ -31,13 +31,13 @@ export class Consumption {
 
   toApi() {
     const data = {
-      supply_id: this.supplyId,
+      supplyId: this.supplyId,
       quantity: this.quantity,
+      consultationId: this.consultationId,
+      message: this.message,
+      name: this.name,
+      remainingStock: this.remainingStock,
     };
-
-    if (this.consultationId != null) {
-      data.consultation_id = this.consultationId;
-    }
 
     return data;
   }
@@ -51,6 +51,19 @@ export class Consumption {
       name: data.name ?? '',
       remainingStock: data.remaining_stock ?? null,
     });
+  }
+
+  toApiCreate() {
+    const data = {
+      supply_id: this.supplyId,
+      quantity: this.quantity,
+    };
+
+    if (this.consultationId != null) {
+      data.consultation_id = this.consultationId;
+    }
+
+    return data;
   }
 
   equals(other) {

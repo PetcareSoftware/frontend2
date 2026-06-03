@@ -571,6 +571,120 @@ export const supplies = [
   },
 ];
 
+export const purchaseOrders = [
+  {
+    id: 'po-2026-001',
+    supplier: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    supplier_name: 'Distribuidora VetSupply C.A.',
+    status: 'REQUESTED',
+    total_cost: 160,
+    created_at: '2026-05-18T09:15:00Z',
+    updated_at: '2026-05-18T09:15:00Z',
+    items: [
+      {
+        id: 'poi-001',
+        supply: 1,
+        supply_name: 'Paracetamol 500mg',
+        supply_sku: 'SKU-PAR500',
+        quantity_requested: 20,
+        unit_cost: 8,
+      },
+    ],
+  },
+  {
+    id: 'po-2026-002',
+    supplier: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+    supplier_name: 'Insumos Médicos del Centro',
+    status: 'REQUESTED',
+    total_cost: 54,
+    created_at: '2026-05-20T14:30:00Z',
+    updated_at: '2026-05-20T14:30:00Z',
+    items: [
+      {
+        id: 'poi-002',
+        supply: 2,
+        supply_name: 'Gasa Estéril',
+        supply_sku: 'SKU-GASA01',
+        quantity_requested: 45,
+        unit_cost: 1.2,
+      },
+    ],
+  },
+  {
+    id: 'po-2026-003',
+    supplier: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
+    supplier_name: 'Farmacéutica Animal Health',
+    status: 'APPROVED',
+    total_cost: 95,
+    created_at: '2026-05-12T11:00:00Z',
+    updated_at: '2026-05-14T16:45:00Z',
+    items: [
+      {
+        id: 'poi-003',
+        supply: 3,
+        supply_name: 'Acetaminofen',
+        supply_sku: 'SKU-ACE500',
+        quantity_requested: 19,
+        unit_cost: 5,
+      },
+    ],
+  },
+  {
+    id: 'po-2026-004',
+    supplier: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    supplier_name: 'Distribuidora VetSupply C.A.',
+    status: 'CANCELLED',
+    total_cost: 128,
+    created_at: '2026-05-08T08:20:00Z',
+    updated_at: '2026-05-09T10:05:00Z',
+    items: [
+      {
+        id: 'poi-004a',
+        supply: 1,
+        supply_name: 'Paracetamol 500mg',
+        supply_sku: 'SKU-PAR500',
+        quantity_requested: 10,
+        unit_cost: 8,
+      },
+      {
+        id: 'poi-004b',
+        supply: 2,
+        supply_name: 'Gasa Estéril',
+        supply_sku: 'SKU-GASA01',
+        quantity_requested: 40,
+        unit_cost: 1.2,
+      },
+    ],
+  },
+  {
+    id: 'po-2026-005',
+    supplier: 'd4e5f6a7-b8c9-0123-def0-234567890123',
+    supplier_name: 'Proveedor Nacional de Insumos',
+    status: 'REQUESTED',
+    total_cost: 213,
+    created_at: '2026-05-25T17:40:00Z',
+    updated_at: '2026-05-25T17:40:00Z',
+    items: [
+      {
+        id: 'poi-005a',
+        supply: 1,
+        supply_name: 'Paracetamol 500mg',
+        supply_sku: 'SKU-PAR500',
+        quantity_requested: 15,
+        unit_cost: 8,
+      },
+      {
+        id: 'poi-005b',
+        supply: 3,
+        supply_name: 'Acetaminofen',
+        supply_sku: 'SKU-ACE500',
+        quantity_requested: 18,
+        unit_cost: 5,
+      },
+    ],
+  },
+];
+
 export const revenueHistory = {
   today: [
     { label: '08:00', amount: 0 },

@@ -88,11 +88,17 @@ export class Pet {
     });
   }
 
-  toApiUpdate() {
-    let data = this.toApi();
+  toApiCreate() {
+    const data = this.toApi();
     delete data.id;
-    delete data.owner_id;
     delete data.created_at;
+
+    return data;
+  }
+
+  toApiUpdate() {
+    const data = this.toApiCreate();
+    delete data.owner_id;
 
     return data;
   }

@@ -24,4 +24,19 @@ export class Deworming extends Treatment {
 
     return true;
   }
+
+  toApi() {
+    const data = super.toApi();
+    data.product = this.product;
+    data.weight = this.weight;
+
+    return data;
+  }
+
+  toApiCreate() {
+    const data = this.toApi();
+    delete data.id;
+
+    return data;
+  }
 }

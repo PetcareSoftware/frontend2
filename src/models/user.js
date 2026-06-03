@@ -45,6 +45,13 @@ export class User {
     });
   }
 
+  toApiCreate() {
+    const data = this.toApi();
+    delete data.id;
+
+    return data;
+  }
+
   equals(other) {
     return this.id === other.id || this.email === other.email || (
       this.name.toLowerCase() === other.name.toLowerCase() );

@@ -31,4 +31,23 @@ export class Treatment {
 
     return true;
   }
+
+  toApi() {
+    const data = {
+      id: this.id,
+      petId: this.petId,
+      date: this.date,
+      nextDate: this.nextDate,
+      appliedBy: this.appliedBy,
+    };
+
+    return data;
+  }
+
+  toApiCreate() {
+    const data = this.toApi();
+    delete data.id;
+
+    return data;
+  }
 }

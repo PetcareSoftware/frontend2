@@ -26,4 +26,22 @@ export class Veterinarian {
 
     return true;
   }
+
+  toApi() {
+    const data = {
+      id: this.id,
+      name: this.name,
+      specialty: this.specialty,
+      avatar: this.avatar,
+    };
+
+    return data;
+  }
+
+  toApiCreate() {
+    const data = this.toApi();
+    delete data.id;
+
+    return data;
+  }
 }
