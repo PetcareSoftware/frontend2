@@ -42,7 +42,7 @@ export class Alert {
 
   validate() {
     if (!this.supplyId) {
-      throw new ValidationError('Insumo inválido', 'supplyId');
+      throw new ValidationError('Insumo invï¿½lido', 'supplyId');
     }
 
     return true;
@@ -60,7 +60,7 @@ export class Alert {
       threshold_value: this.thresholdValue,
       days_remaining: this.daysRemaining,
       batch_id: this.batchId,
-      lot_number: this.lotNumber,
+      lot_number: this.lotNumber
     };
 
     return data;
